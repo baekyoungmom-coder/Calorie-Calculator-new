@@ -288,9 +288,225 @@ fieldset { padding: 0; margin: 0; border: 0; }
 .profile-card p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
 .profile-card a { color: var(--green-dark); font-size: 12px; font-weight: 800; }
 
+/* 참고 이미지의 따뜻한 색감과 모바일 카드 구성을 반영한 홈/로그인 전용 UI */
+.landing {
+  justify-content: flex-start;
+  padding: 72px 28px 34px;
+  background:
+    radial-gradient(circle at 14% 28%, rgb(244 113 78 / 10%) 0 80px, transparent 81px),
+    radial-gradient(circle at 86% 12%, rgb(142 188 86 / 14%) 0 100px, transparent 101px),
+    #fff9f0;
+  text-align: center;
+}
+
+.landing::before {
+  width: 320px;
+  height: 230px;
+  right: -150px;
+  top: -95px;
+  background: #ffe7d5;
+  border-radius: 45% 55% 58% 42%;
+  transform: rotate(18deg);
+}
+
+.landing-brand {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  margin: 62px 0 34px;
+  font-size: clamp(48px, 14vw, 68px);
+  font-weight: 950;
+  line-height: .98;
+  letter-spacing: -.07em;
+}
+.landing-brand span { color: #f57154; }
+.landing-brand strong { color: #73a94f; }
+
+.landing h1 {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(27px, 7.5vw, 38px);
+  line-height: 1.3;
+  letter-spacing: -.045em;
+}
+
+.landing .lead {
+  position: relative;
+  z-index: 1;
+  margin: 18px 0 34px;
+  color: #6d5d52;
+  font-size: 15px;
+}
+
+.landing .action-stack { position: relative; z-index: 1; gap: 14px; }
+
+.landing-photo-button,
+.landing-text-button {
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 21px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow: 0 9px 0 rgb(90 65 45 / 13%), 0 16px 24px rgb(88 64 47 / 12%);
+}
+.landing-photo-button { background: linear-gradient(135deg, #ff7657, #f3654f); }
+.landing-text-button { background: linear-gradient(135deg, #abd86f, #86ba55); }
+.landing-photo-button span,
+.landing-text-button span { font-size: 25px; }
+
+.login-link {
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  margin: 34px auto 0;
+  padding: 8px 2px;
+  border-bottom: 1px solid #9a918a;
+  color: #837a74;
+  font-weight: 800;
+}
+
+.landing .quick-nav { position: relative; z-index: 1; margin-top: 18px; }
+
+.landing-fruit,
+.food-decoration {
+  position: absolute;
+  display: flex;
+  gap: 7px;
+  color: #7cad50;
+  pointer-events: none;
+}
+.landing-fruit span,
+.food-decoration span {
+  display: block;
+  border-radius: 60% 40% 55% 45%;
+  font-size: 34px;
+  line-height: 1;
+  transform: rotate(25deg);
+}
+.landing-fruit-top { top: 32px; right: 34px; color: #7cad50; }
+.landing-fruit-top span:nth-child(2) { color: #596ca5; font-size: 18px; }
+.landing-fruit-top span:nth-child(3) { color: #764f76; font-size: 22px; }
+.landing-fruit-bottom { left: 18px; bottom: 18px; color: #f26f50; opacity: .55; }
+
+.landing-user {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 11px;
+  margin-top: 30px;
+  padding: 13px;
+  border: 1px solid #eadfd4;
+  border-radius: 18px;
+  background: rgb(255 255 255 / 78%);
+  text-align: left;
+}
+.landing-user img,
+.landing-user-fallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.landing-user-fallback {
+  display: grid;
+  place-items: center;
+  background: #89b95a;
+  color: #fff;
+  font-weight: 900;
+}
+.landing-user strong,
+.landing-user small { display: block; }
+.landing-user small { max-width: 210px; margin-top: 3px; overflow: hidden; color: #7d746e; text-overflow: ellipsis; }
+.landing-user button {
+  border: 0;
+  background: transparent;
+  color: #d85e48;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.auth-page {
+  width: min(100%, 520px);
+  min-height: 100vh;
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  padding: 70px 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 15%, #ffe4d0 0 120px, transparent 121px),
+    radial-gradient(circle at 8% 88%, #eaf3d7 0 115px, transparent 116px),
+    #fff9f0;
+}
+.auth-back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 75%);
+  font-size: 24px;
+}
+.auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 34px 24px;
+  border: 1px solid #eee2d7;
+  border-radius: 28px;
+  background: rgb(255 255 255 / 84%);
+  box-shadow: 0 20px 50px rgb(98 71 52 / 10%);
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+.auth-kicker { margin: 0 0 12px; color: #ef6e52; font-weight: 900; }
+.auth-card h1 { margin: 0; font-size: 38px; letter-spacing: -.05em; }
+.auth-card > p:not(.auth-kicker, .error) { margin: 14px 0 30px; color: #766b64; line-height: 1.6; }
+.auth-card .error { margin: 0 0 16px; text-align: left; }
+.google-button {
+  width: 100%;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid #ded8d2;
+  border-radius: 16px;
+  background: #fff;
+  color: #332d29;
+  cursor: pointer;
+  font-weight: 900;
+}
+.google-button:disabled { cursor: wait; opacity: .65; }
+.google-mark {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #4285f4;
+  border-radius: 50%;
+  color: #4285f4;
+  font-weight: 900;
+}
+.guest-link { display: inline-block; margin-top: 22px; color: #7d756f; font-size: 13px; font-weight: 800; }
+.food-decoration-top { top: 40px; right: 32px; }
+.food-decoration-bottom { bottom: 40px; left: 28px; color: #f27557; }
+
 @media (min-width: 560px) {
   body { padding: 24px 0; }
-  .shell, .landing { min-height: calc(100vh - 48px); border-radius: 28px; box-shadow: 0 18px 55px rgb(24 37 29 / 10%); }
+  .shell, .landing, .auth-page { min-height: calc(100vh - 48px); border-radius: 28px; box-shadow: 0 18px 55px rgb(24 37 29 / 10%); }
   .topbar { border-radius: 28px 28px 0 0; }
 }
 
