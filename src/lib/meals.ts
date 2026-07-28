@@ -14,14 +14,6 @@ export type MealDraft = {
   reason?: string;
 };
 
-export type MealRecord = MealDraft & {
-  id: string;
-  estimatedCalories: number;
-  confidence: "low" | "medium" | "high";
-  reason: string;
-  savedAt: string;
-};
-
 export const MEAL_LABELS: Record<MealType, string> = {
   breakfast: "아침",
   lunch: "점심",
@@ -77,29 +69,7 @@ export function estimateMeal(draft: MealDraft): Required<
   };
 }
 
-const STORAGE_KEY = "calorie-calculator-records";
 const DRAFT_KEY = "calorie-calculator-draft";
-
-export function getRecords(): MealRecord[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]") as MealRecord[];
-  } catch {
-    return [];
-  }
-}
-
-export function saveRecord(record: MealRecord) {
-  const records = getRecords();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([record, ...records]));
-}
-
-export function deleteRecord(id: string) {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(getRecords().filter((record) => record.id !== id)),
-  );
-}
 
 export function setDraft(draft: MealDraft) {
   sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
@@ -115,14 +85,4 @@ export function getDraft(): MealDraft | null {
 
 export function clearDraft() {
   sessionStorage.removeItem(DRAFT_KEY);
-}
-
-export function isToday(value: string) {
-  const date = new Date(value);
-  const now = new Date();
-  return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
-  );
 }

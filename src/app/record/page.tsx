@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 
 export default function RecordPage() {
@@ -28,6 +29,7 @@ export default function RecordPage() {
           <span aria-hidden="true">→</span>
         </Link>
       </section>
+      <BottomNav />
     </main>
   );
 }

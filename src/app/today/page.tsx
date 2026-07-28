@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { RecordsView } from "@/components/RecordsView";
 
@@ -18,6 +19,7 @@ export default function TodayPage() {
       </section>
       <RecordsView mode="today" />
       <Link className="floating-add" href="/record" aria-label="새 식사 기록">＋</Link>
+      <BottomNav />
     </main>
   );
 }

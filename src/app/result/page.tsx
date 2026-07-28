@@ -10,7 +10,6 @@ import {
   clearDraft,
   estimateMeal,
   getDraft,
-  saveRecord,
 } from "@/lib/meals";
 
 const confidenceLabels = { low: "낮음", medium: "보통", high: "높음" };
@@ -21,6 +20,9 @@ export default function ResultPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [requiresLogin, setRequiresLogin] = useState(false);
   const estimate = useMemo(() => (draft ? estimateMeal(draft) : null), [draft]);
 
   useEffect(() => {
@@ -50,19 +52,45 @@ export default function ResultPage() {
   const confidence = draft.confidence ?? estimate.confidence;
   const reason = draft.reason ?? estimate.reason;
 
-  function save() {
+  async function save() {
     if (!draft) return;
-    saveRecord({
-      ...draft,
-      estimatedCalories: calories,
-      confidence,
-      reason,
-      id: crypto.randomUUID(),
-      savedAt: new Date().toISOString(),
-    });
-    clearDraft();
-    setSaved(true);
-    window.setTimeout(() => router.push("/today"), 700);
+    setSaving(true);
+    setSaveError("");
+    setRequiresLogin(false);
+
+    try {
+      const response = await fetch("/api/meal-records", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          inputType: draft.inputType,
+          mealType: draft.mealType,
+          foodName: draft.foodName,
+          amount: draft.amount,
+          memo: draft.memo,
+          estimatedCalories: draft.estimatedCalories ?? estimateMeal(draft).estimatedCalories,
+          finalCalories: calories,
+          confidence,
+          estimateReason: reason,
+          recordedAt: draft.recordedAt,
+          recordedTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
+      });
+      const payload = await response.json() as { message?: string; error?: { code?: string } };
+      if (!response.ok) {
+        const unauthenticated = payload.error?.code === "UNAUTHORIZED";
+        setRequiresLogin(unauthenticated);
+        setSaveError(unauthenticated ? "기록을 저장하려면 먼저 로그인해 주세요." : payload.message ?? "기록을 저장하지 못했습니다.");
+        return;
+      }
+      clearDraft();
+      setSaved(true);
+      window.setTimeout(() => router.push("/today"), 700);
+    } catch {
+      setSaveError("기록을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -107,9 +135,11 @@ export default function ResultPage() {
       </section>
       <p className="reason"><span aria-hidden="true">i</span>{reason}</p>
       {saved && <p className="success" role="status">기록을 저장했어요. 오늘 기록으로 이동합니다.</p>}
+      {saveError && <p className="error" role="alert">{saveError}</p>}
+      {requiresLogin && <Link className="secondary-button" href="/login?next=/result">로그인하고 저장하기</Link>}
       <div className="action-stack">
-        <button className="primary-button" type="button" onClick={editing ? () => setEditing(false) : save} disabled={saved}>
-          {editing ? "수정 완료" : saved ? "저장 완료" : "이 기록 저장하기"}
+        <button className="primary-button" type="button" onClick={editing ? () => setEditing(false) : save} disabled={saved || saving}>
+          {editing ? "수정 완료" : saved ? "저장 완료" : saving ? "저장 중…" : "이 기록 저장하기"}
         </button>
         {!saved && (
           <button className="secondary-button" type="button" onClick={() => setEditing(!editing)}>

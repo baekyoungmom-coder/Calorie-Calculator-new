@@ -19,7 +19,7 @@ Calorie Calculator 앱에서 저장해야 하는 데이터 구조를 정의한�
 
 필드 예시:
 - id
-- name
+- display_name
 - email
 - avatar_url
 - role
@@ -38,14 +38,19 @@ Calorie Calculator 앱에서 저장해야 하는 데이터 구조를 정의한�
 - amount
 - memo
 - estimated_calories
+- final_calories
 - confidence
+- estimate_reason
 - recorded_at
+- recorded_timezone
 - created_at
 - updated_at
-- status : draft / saved / deleted
+- status : draft / saved
 
 ### 3. meal_photos
-사진 입력을 저장하는 보조 테이블 또는 스토리지 참조
+향후 사진 보관 기능을 위한 보조 테이블 또는 스토리지 참조
+
+이번 버전에서는 원본 사진을 저장하지 않으므로 생성하지 않는다.
 
 필드 예시:
 - id
@@ -103,14 +108,16 @@ Calorie Calculator 앱에서 저장해야 하는 데이터 구조를 정의한�
 ## 관계 규칙
 
 - `profiles.id`는 인증 시스템의 사용자 ID와 연결한다.
-- `meal_records.user_id`는 `profiles.id`를 참조한다.
-- `meal_photos.meal_record_id`는 `meal_records.id`를 참조한다.
+- `meal_records.user_id`는 인증 시스템의 사용자 ID를 참조한다.
+- 사진 보관 기능을 추가할 경우 `meal_photos.meal_record_id`는 `meal_records.id`를 참조한다.
 - `calorie_estimates.meal_record_id`는 `meal_records.id`를 참조한다.
-- 한 개의 식사 기록은 여러 사진을 가질 수 있지만, 초기 버전에서는 1개 사진만 허용할 수 있다.
+- 사진 보관 기능을 추가할 경우 한 개의 식사 기록은 여러 사진을 가질 수 있지만, 초기 버전에서는 1개 사진만 허용할 수 있다.
 
 ## 처리 기준
 
 - 저장 전 입력값 검증을 먼저 수행한다.
 - 추정 결과는 저장하되, 원본 응답 전문은 저장하지 않는다.
 - 사용자가 수정한 최종값을 별도로 남길 수 있다.
+- 기록 시점의 기기 시간대도 함께 저장해 오늘 기록을 올바르게 구분한다.
+- 이번 버전에서는 원본 사진을 저장하지 않고 분석 요청에만 사용한다.
 - 관리자 통계는 로그에서 집계하되, 개인 식사 내용은 과도하게 노출하지 않는다.

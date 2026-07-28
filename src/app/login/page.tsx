@@ -5,9 +5,10 @@ import { signInWithGoogle } from "./actions";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, next } = await searchParams;
+  const safeNext = next?.startsWith("/") && !next.startsWith("//") ? next : "/";
 
   return (
     <main className="auth-page">
@@ -24,10 +25,23 @@ export default async function LoginPage({
         {error === "missing-config" && (
           <p className="error">Supabase 환경변수 설정이 필요합니다.</p>
         )}
-        {error === "oauth" && (
-          <p className="error">로그인하지 못했습니다. 다시 시도해 주세요.</p>
+        {error === "oauth-init" && (
+          <p className="error">Google 로그인을 시작하지 못했습니다. Supabase Google 공급자 설정을 확인해 주세요.</p>
+        )}
+        {error === "oauth-origin" && (
+          <p className="error">로그인에 사용할 앱 주소를 확인하지 못했습니다. 앱 URL 설정을 확인해 주세요.</p>
+        )}
+        {error === "oauth-provider" && (
+          <p className="error">Google에서 로그인이 취소되었거나 거부되었습니다.</p>
+        )}
+        {error === "oauth-exchange" && (
+          <p className="error">로그인 세션을 만들지 못했습니다. 콜백 URL 설정을 확인해 주세요.</p>
+        )}
+        {error === "oauth-callback" && (
+          <p className="error">로그인 콜백에 인증 코드가 없습니다. 리다이렉트 설정을 확인해 주세요.</p>
         )}
         <form action={signInWithGoogle}>
+          <input type="hidden" name="next" value={safeNext} />
           <GoogleLoginButton />
         </form>
         <Link className="guest-link" href="/">

@@ -8,7 +8,8 @@ Calorie Calculator 앱의 개발 및 배포 환경에서 필요한 설정값을 
 
 ### 인증
 - NEXT_PUBLIC_SUPABASE_URL=
-- NEXT_PUBLIC_SUPABASE_ANON_KEY=
+- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+- NEXT_PUBLIC_APP_URL=http://localhost:3000
 - SUPABASE_SERVICE_ROLE_KEY=
 
 ### 칼로리 추정

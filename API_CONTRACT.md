@@ -69,13 +69,17 @@ POST /api/meal-records
 
 ```json
 {
+  "inputType": "text",
   "mealType": "dinner",
   "foodName": "샐러드",
   "amount": "1그릇",
   "memo": "드레싱 적게",
   "estimatedCalories": 180,
-  "imageUrl": "optional",
-  "recordedAt": "2026-07-27T12:34:56Z"
+  "finalCalories": 180,
+  "confidence": "medium",
+  "estimateReason": "입력한 음식 이름과 양을 기준으로 추정했어요.",
+  "recordedAt": "2026-07-27T12:34:56Z",
+  "recordedTimezone": "Asia/Seoul"
 }
 ```
 
@@ -85,11 +89,16 @@ POST /api/meal-records
 {
   "success": true,
   "data": {
-    "recordId": "generated-id",
-    "savedAt": "2026-07-27T12:34:56Z"
+    "record": {}
   }
 }
 ```
+
+### 전체 기록 조회
+
+GET /api/meal-records
+
+로그인한 사용자의 기록을 최신 기록 시각 순으로 조회한다.
 
 ## 3. 오늘 기록 조회
 
@@ -100,6 +109,10 @@ GET /api/meal-records/today
 ### 목적
 
 오늘 저장된 식사 기록과 총 섭취 칼로리를 조회한다.
+
+### Query
+
+- `timezone`: 사용자의 IANA 기기 시간대. 예: `Asia/Seoul`
 
 ### 외부 서비스
 
@@ -139,6 +152,10 @@ GET /api/meal-records/:id
     "amount": "1줄",
     "mealType": "lunch",
     "estimatedCalories": 420,
+    "finalCalories": 420,
+    "inputType": "text",
+    "confidence": "medium",
+    "recordedTimezone": "Asia/Seoul",
     "memo": "참치 김밥",
     "recordedAt": "2026-07-27T12:34:56Z"
   }
@@ -159,11 +176,16 @@ PATCH /api/meal-records/:id
 
 ```json
 {
+  "inputType": "text",
   "foodName": "참치 김밥",
   "amount": "1줄",
   "mealType": "lunch",
   "memo": "드레싱 제외",
-  "estimatedCalories": 410
+  "estimatedCalories": 410,
+  "finalCalories": 410,
+  "confidence": "medium",
+  "recordedAt": "2026-07-27T13:00:00Z",
+  "recordedTimezone": "Asia/Seoul"
 }
 ```
 
@@ -268,7 +290,9 @@ GET /api/admin/stats
 - `amount`는 숫자 또는 사람이 읽을 수 있는 양 표현을 허용하되 비어 있으면 안 된다.
 - `memo`는 선택 입력이며 길이 제한을 둔다.
 - `estimatedCalories`는 0 이상의 숫자여야 한다.
+- `finalCalories`는 0 이상의 숫자여야 하며, 사용자가 수정하면 이 값을 최종값으로 사용한다.
 - `recordedAt`은 ISO 8601 형식의 날짜/시간이어야 한다.
+- `recordedTimezone`은 기록 시점 기기의 IANA 시간대여야 한다.
 - 저장 및 수정 요청은 현재 로그인한 사용자의 데이터만 허용한다.
 - 사진과 텍스트를 함께 보낼 경우 둘 다 검증한다.
 - 입력값이 부족하면 칼로리 계산 대신 보완 입력을 요청한다.
