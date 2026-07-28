@@ -21,3 +21,13 @@ Calorie Calculator는 사용자가 음식 사진 또는 텍스트 입력으로 �
 - 로컬 빌드가 성공한다.
 - 주요 화면 이동이 동작한다.
 - 기록 저장이 가능하다.
+
+## 환경변수와 보안
+
+- API 키와 시크릿은 코드나 MD 파일에 직접 작성하지 않는다.
+- 로컬 개발 값은 `.env.local`에 저장한다.
+- `.env.local`의 실제 값을 읽어서 응답에 출력하지 않는다.
+- `.env.local`은 GitHub에 Commit하지 않는다.
+- 필요한 환경변수 이름만 `.env.example`에 기록한다.
+- `NEXT_PUBLIC_`으로 시작하는 값은 브라우저에 노출된다는 점을 고려한다.
+- service role key와 외부 API secret은 서버에서만 사용한다.

@@ -134,3 +134,15 @@ LLM은 다음을 결정하지 않는다.
 - 이전 식사 기록을 조회할 수 있다.
 - 로컬 빌드가 성공한다.
 - 최종적으로 배포 가능한 상태가 된다.
+
+## 환경변수
+
+이 프로젝트에는 다음 환경변수가 필요하다.
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+  - Supabase 프로젝트 주소
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+  - 브라우저에서 사용하는 Supabase 공개 키
+
+실제 값은 `.env.local`과 Vercel Environment Variables에 저장한다.
+MD 파일과 GitHub에는 실제 값을 기록하지 않는다.
