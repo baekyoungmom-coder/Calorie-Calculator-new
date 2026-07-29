@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AppIcon } from "./AppIcon";
 
 const items = [
-  { href: "/today", label: "기록", icon: "▤" },
-  { href: "/record", label: "새 기록", icon: "＋" },
-  { href: "/mypage", label: "마이페이지", icon: "♙" },
+  { href: "/today", label: "기록", icon: "clipboard" as const },
+  { href: "/record", label: "새 기록", icon: "plus" as const },
+  { href: "/mypage", label: "마이페이지", icon: "user" as const },
 ];
 
 export function BottomNav() {
@@ -25,7 +26,7 @@ export function BottomNav() {
             href={item.href}
             key={item.href}
           >
-            <span aria-hidden="true">{item.icon}</span>
+            <span className="bottom-nav-icon"><AppIcon name={item.icon} size={21} /></span>
             {item.label}
           </Link>
         );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { RecordsView } from "@/components/RecordsView";
+import { AppIcon } from "@/components/AppIcon";
 
 export default function TodayPage() {
   const date = new Intl.DateTimeFormat("ko-KR", {
@@ -18,7 +19,7 @@ export default function TodayPage() {
         <h1>오늘도 잘 기록하고 있어요</h1>
       </section>
       <RecordsView mode="today" />
-      <Link className="floating-add" href="/record" aria-label="새 식사 기록">＋</Link>
+      <Link className="floating-add" href="/record" aria-label="새 식사 기록"><AppIcon name="plus" /></Link>
       <BottomNav />
     </main>
   );

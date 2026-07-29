@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { MealForm } from "@/components/MealForm";
+import { AppIcon } from "@/components/AppIcon";
 
 export default function PhotoRecordPage() {
   const [preview, setPreview] = useState("");
@@ -58,7 +59,7 @@ export default function PhotoRecordPage() {
           </>
         ) : (
           <>
-            <span className="upload-icon" aria-hidden="true">＋</span>
+            <span className="upload-icon"><AppIcon name="camera" size={25} /></span>
             <strong>사진을 선택하세요</strong>
             <span>JPG, PNG, WEBP · 최대 8MB</span>
             <label className="upload-button">
@@ -68,6 +69,9 @@ export default function PhotoRecordPage() {
           </>
         )}
       </section>
+      {!preview && (
+        <p className="flow-note"><AppIcon name="sparkles" size={17} /> 사진은 이 기기에만 임시로 표시되며, 저장 전 음식 정보를 직접 확인해요.</p>
+      )}
       {error && <p className="error" role="alert">{error}</p>}
       {preview ? (
         <MealForm inputType="photo" imageName={imageName} />

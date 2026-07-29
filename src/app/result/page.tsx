@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "@/components/Header";
+import { AppIcon } from "@/components/AppIcon";
 import {
   MealDraft,
   MEAL_LABELS,
@@ -238,6 +239,7 @@ export default function ResultPage() {
             : `게스트 체험 ${trialAccess.used}/${trialAccess.limit} · ${trialAccess.remaining}회 남음`}
         </p>
       )}
+      <p className="result-kicker"><AppIcon name="sparkles" size={17} /> 저장하기 전에 값을 확인해요</p>
       <section className="result-hero">
         <p>
           {draft.calorieSource === "manual"

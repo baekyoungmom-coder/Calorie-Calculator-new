@@ -3,6 +3,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { RecordsView } from "@/components/RecordsView";
 import { createClient } from "@/lib/supabase/server";
+import { AppIcon } from "@/components/AppIcon";
 
 export default async function MyPage() {
   const supabase = await createClient();
@@ -24,7 +25,7 @@ export default async function MyPage() {
           <strong>{name}</strong>
           <p>{user?.email ?? "로그인하면 기록을 안전하게 저장할 수 있어요."}</p>
         </div>
-        <Link href="/record">새 기록</Link>
+        <Link className="profile-record-link" href="/record"><AppIcon name="plus" size={16} /> 새 기록</Link>
       </section>
       <RecordsView mode="all" />
       <BottomNav />
