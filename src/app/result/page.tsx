@@ -273,6 +273,16 @@ export default function ResultPage() {
           ) : <strong>{draft.amount}</strong>}
         </div>
         <div><span>식사</span><strong>{MEAL_LABELS[draft.mealType]}</strong></div>
+        {estimate.matchedFoodName && estimate.caloriesPerServing !== null && (
+          <div>
+            <span>계산 기준</span>
+            <strong>
+              1인분 {Math.round(estimate.caloriesPerServing).toLocaleString()} kcal
+              {estimate.servings !== null &&
+                ` × ${estimate.servings.toLocaleString("ko-KR")}`}
+            </strong>
+          </div>
+        )}
         <div><span>기록 시간</span><strong>{new Date(draft.recordedAt).toLocaleString("ko-KR")}</strong></div>
       </section>
       <p className="reason"><span aria-hidden="true">i</span>{reason}</p>

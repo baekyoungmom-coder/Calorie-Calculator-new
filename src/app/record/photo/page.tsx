@@ -45,7 +45,7 @@ export default function PhotoRecordPage() {
       <section className="page-intro compact">
         <p className="eyebrow">사진 기록</p>
         <h1>음식 사진을 올려주세요</h1>
-        <p>밝은 곳에서 음식 전체가 보이는 사진이 좋아요.</p>
+        <p>사진을 첨부한 뒤 음식 목록과 인분 수를 선택해 주세요.</p>
       </section>
 
       <section className={`upload-box ${preview ? "has-image" : ""}`}>

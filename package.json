@@ -6,6 +6,7 @@
   "scripts": {
     "generate:calorie-data": "node scripts/generate-calorie-data.mjs",
     "prebuild": "npm run generate:calorie-data",
+    "test:calorie": "node --no-warnings --test tests/calorie-catalog.test.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

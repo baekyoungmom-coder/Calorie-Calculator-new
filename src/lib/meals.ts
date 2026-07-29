@@ -1,4 +1,12 @@
 import calorieCatalog from "@/generated/calorie-catalog.json";
+import {
+  CalorieFood,
+  calculateServingCalories,
+  findExactCalorieFood,
+  parseServingMultiplier,
+  prepareCalorieCatalog,
+  searchPreparedCalorieCatalog,
+} from "@/lib/calorie-catalog";
 
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 export type InputType = "photo" | "text";
@@ -24,103 +32,30 @@ export const MEAL_LABELS: Record<MealType, string> = {
   snack: "간식",
 };
 
-type CatalogEntry = {
-  name: string;
-  calories: number;
-  normalizedName: string;
-};
+const CATALOG = prepareCalorieCatalog(calorieCatalog);
 
-type CatalogMatch = {
-  name: string;
-  calories: number;
-  count: number;
-  matchType: "exact" | "contained" | "family";
-};
+export const SERVING_OPTIONS = [0.5, 1, 1.5, 2, 3] as const;
 
-const CATALOG: CatalogEntry[] = calorieCatalog.map((entry) => ({
-  ...entry,
-  normalizedName: normalizeFoodName(entry.name),
-}));
-
-function normalizeFoodName(value: string) {
-  return value
-    .normalize("NFKC")
-    .toLowerCase()
-    .replace(/[^0-9a-z가-힣]/gi, "");
+export function findCalorieFood(foodName: string): CalorieFood | null {
+  return findExactCalorieFood(CATALOG, foodName);
 }
 
-function averageMatch(
-  entries: CatalogEntry[],
-  matchType: CatalogMatch["matchType"],
-): CatalogMatch {
-  const calories =
-    entries.reduce((sum, entry) => sum + entry.calories, 0) / entries.length;
-
-  return {
-    name: entries[0].name,
-    calories,
-    count: entries.length,
-    matchType,
-  };
-}
-
-function findCatalogMatch(foodName: string): CatalogMatch | null {
-  const normalizedInput = normalizeFoodName(foodName);
-  if (!normalizedInput) return null;
-
-  const exactEntries = CATALOG.filter(
-    (entry) => entry.normalizedName === normalizedInput,
-  );
-  if (exactEntries.length) return averageMatch(exactEntries, "exact");
-
-  const containedEntries = CATALOG.filter(
-    (entry) =>
-      entry.normalizedName.length >= 2 &&
-      normalizedInput.includes(entry.normalizedName),
-  );
-  if (containedEntries.length) {
-    const longestLength = Math.max(
-      ...containedEntries.map((entry) => entry.normalizedName.length),
-    );
-    const longestName = containedEntries.find(
-      (entry) => entry.normalizedName.length === longestLength,
-    )?.normalizedName;
-    const closestEntries = containedEntries.filter(
-      (entry) => entry.normalizedName === longestName,
-    );
-    return averageMatch(closestEntries, "contained");
-  }
-
-  if (normalizedInput.length >= 2) {
-    const familyEntries = CATALOG.filter((entry) =>
-      entry.normalizedName.includes(normalizedInput),
-    );
-    if (familyEntries.length) return averageMatch(familyEntries, "family");
-  }
-
-  return null;
+export function searchCalorieFoods(foodName: string, limit = 6) {
+  return searchPreparedCalorieCatalog(CATALOG, foodName, limit);
 }
 
 function amountMultiplier(amount: string) {
-  const number = Number.parseFloat(amount.match(/\d+(\.\d+)?/)?.[0] ?? "1");
-  if (!Number.isFinite(number) || number <= 0) {
-    return { multiplier: 1, isConvertible: false };
-  }
-
   if (/(?:kg|킬로그램|g|그램|ml|밀리리터|l|리터)(?:\s|$)/i.test(amount)) {
     return { multiplier: 1, isConvertible: false };
   }
 
-  const hasCountUnit =
-    /(인분|그릇|접시|공기|개|줄|봉|컵|조각|쪽|마리|팩|병|캔)/.test(amount);
-  const isBareNumber = /^\s*\d+(?:\.\d+)?\s*$/.test(amount);
-
-  if (!hasCountUnit && !isBareNumber) {
+  const multiplier = parseServingMultiplier(amount);
+  if (multiplier === null) {
     return { multiplier: 1, isConvertible: false };
   }
 
   return {
-    multiplier: Math.min(Math.max(number, 0.1), 10),
+    multiplier,
     isConvertible: true,
   };
 }
@@ -131,27 +66,37 @@ function formatCalories(value: number) {
 
 export function estimateMeal(draft: MealDraft): Required<
   Pick<MealDraft, "estimatedCalories" | "confidence" | "reason">
-> {
+> & {
+  matchedFoodName: string | null;
+  caloriesPerServing: number | null;
+  servings: number | null;
+} {
   if (!draft.foodName.trim() || draft.foodName === "사진 속 음식") {
     return {
       estimatedCalories: 450,
       confidence: "low",
       reason:
         "사진만으로 만든 임시 추정치예요. 음식 이름과 양을 확인하면 기록이 더 정확해져요.",
+      matchedFoodName: null,
+      caloriesPerServing: null,
+      servings: null,
     };
   }
 
-  const match = findCatalogMatch(draft.foodName);
+  const match = findCalorieFood(draft.foodName);
   const amount = amountMultiplier(draft.amount);
   const base = match?.calories ?? (draft.inputType === "photo" ? 450 : 350);
-  const calories = Math.round(base * amount.multiplier);
+  const calories = calculateServingCalories(base, amount.multiplier);
 
   if (!match) {
     return {
       estimatedCalories: calories,
       confidence: "low",
       reason:
-        "칼로리 정보 파일에서 일치하는 음식을 찾지 못해 임시 추정값을 표시했어요. 음식 이름과 결과를 확인해 주세요.",
+        "칼로리 정보 파일에서 정확히 일치하는 음식을 찾지 못해 임시 추정값을 표시했어요. 음식 이름과 결과를 직접 확인해 주세요.",
+      matchedFoodName: null,
+      caloriesPerServing: null,
+      servings: amount.isConvertible ? amount.multiplier : null,
     };
   }
 
@@ -165,8 +110,11 @@ export function estimateMeal(draft: MealDraft): Required<
 
   return {
     estimatedCalories: calories,
-    confidence: match.matchType === "family" ? "low" : "medium",
+    confidence: "medium",
     reason: `${sourceDescription}를 기준으로 ${amountDescription}`,
+    matchedFoodName: match.name,
+    caloriesPerServing: match.calories,
+    servings: amount.isConvertible ? amount.multiplier : null,
   };
 }
 
