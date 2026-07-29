@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { CalorieGoalCard } from "@/components/CalorieGoalCard";
 import { MEAL_LABELS, MealType } from "@/lib/meals";
 
 const MEAL_EMOJIS = {
@@ -177,17 +178,25 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
 
   return (
     <>
-      <section className="summary-card">
-        <p>{mode === "today" ? "오늘 총 섭취량" : "최근 7일 총 섭취량"}</p>
-        <h1>{(mode === "today" ? total : weekTotal).toLocaleString()} <span>kcal</span></h1>
-        <small>{mode === "today" ? records.length : weekRecords.length}개의 식사 기록</small>
-      </section>
+      {mode === "today" ? (
+        <section className="summary-card">
+          <p>오늘 총 섭취량</p>
+          <h1>{total.toLocaleString()} <span>kcal</span></h1>
+          <small>{records.length}개의 식사 기록</small>
+        </section>
+      ) : (
+        <CalorieGoalCard todayCalories={dailyTotals.at(-1)?.calories ?? 0} />
+      )}
 
       {error && <p className="error" role="alert">{error}</p>}
 
       {mode === "all" && (
         <>
           <section className="weekly-stats" aria-label="최근 7일 섭취 통계">
+            <article>
+              <span>7일 합계</span>
+              <strong>{weekTotal.toLocaleString()} <small>kcal</small></strong>
+            </article>
             <article>
               <span>하루 평균</span>
               <strong>{dailyAverage.toLocaleString()} <small>kcal</small></strong>

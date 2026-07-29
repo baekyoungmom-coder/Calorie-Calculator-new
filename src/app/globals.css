@@ -673,23 +673,89 @@ input:focus, textarea:focus { border-color: #66b8aa; box-shadow: 0 0 0 3px rgb(1
   color: #2b5c60;
   text-align: center;
 }
-.summary-card::after {
-  content: "";
-  position: absolute;
-  right: 28px;
-  bottom: 17px;
-  left: 28px;
-  height: 7px;
-  border-radius: 99px;
-  background: linear-gradient(90deg, #63c9b3 0 68%, #e6edef 68%);
-}
 .summary-card p { color: #54777d; font-weight: 700; }
 .summary-card h1 { color: #3f8c82; font-size: 38px; }
-.summary-card small { display: block; padding-bottom: 13px; color: #70898d; }
+.summary-card small { display: block; color: #70898d; }
+
+.goal-card { margin-bottom: 28px; }
+.goal-card h1 span { font-size: 15px; }
+.goal-card .goal-editor-title { font-size: 25px; }
+.goal-card .goal-loading { color: #769195; font-size: 22px; }
+.goal-progress {
+  height: 8px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #e3ecee;
+}
+.goal-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #64c9b5, #48a092);
+  transition: width .25s ease;
+}
+.goal-progress.over i { background: linear-gradient(90deg, #efb06f, #df876a); }
+.goal-form {
+  display: grid;
+  grid-template-columns: 1fr 78px;
+  gap: 8px;
+  margin-top: 18px;
+}
+.goal-form label {
+  position: relative;
+  display: block;
+}
+.goal-form input {
+  height: 48px;
+  padding: 0 50px 0 14px;
+  text-align: right;
+}
+.goal-form label small {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  transform: translateY(-50%);
+  font-size: 11px;
+  pointer-events: none;
+}
+.goal-form > button {
+  border: 0;
+  border-radius: 14px;
+  background: #54a99b;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 800;
+}
+.goal-form > button:disabled { cursor: wait; opacity: .65; }
+.goal-help { margin-top: 10px; font-size: 11px; }
+.goal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 13px;
+}
+.goal-actions button, .goal-cancel-button {
+  border: 0;
+  background: transparent;
+  color: #558087;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+}
+.goal-actions button:last-child { color: #9a6b67; }
+.goal-actions button:disabled { cursor: wait; opacity: .55; }
+.goal-cancel-button { margin-top: 10px; }
+.goal-card > .error, .goal-card > .success {
+  margin: 12px 0 0;
+  text-align: left;
+}
+.goal-card > .error { color: var(--danger); }
+.goal-card > .success { color: #347c70; }
 
 .weekly-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 9px;
   margin: -14px 0 20px;
 }
