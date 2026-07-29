@@ -17,7 +17,7 @@ export default async function MyPage() {
 
   return (
     <main className="shell">
-      <Header title="지난 기록" />
+      <Header title="마이페이지" />
       <section className="profile-card">
         <div className="avatar" aria-hidden="true">{name.slice(0, 1).toUpperCase()}</div>
         <div>
