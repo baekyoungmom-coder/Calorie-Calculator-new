@@ -9,6 +9,7 @@ import {
   findCalorieFood,
   MealType,
   parseServingMultiplier,
+  searchCalorieFoods,
   SERVING_OPTIONS,
 } from "@/lib/meals";
 
@@ -42,6 +43,7 @@ export default function RecordDetailPage() {
   const [error, setError] = useState("");
   const [calorieMessage, setCalorieMessage] = useState("");
   const [calculationServings, setCalculationServings] = useState(1);
+  const [manualEntry, setManualEntry] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -55,6 +57,7 @@ export default function RecordDetailPage() {
         const loadedRecord = payload.data.record;
         const detectedServings = parseServingMultiplier(loadedRecord.amount);
         setRecord(loadedRecord);
+        setManualEntry(!findCalorieFood(loadedRecord.foodName));
         setCalculationServings(
           detectedServings !== null &&
             SERVING_OPTIONS.some((option) => option === detectedServings)
@@ -73,6 +76,31 @@ export default function RecordDetailPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!record) return;
+    if (!record.foodName.trim()) {
+      setError("음식 이름을 입력해 주세요.");
+      return;
+    }
+    if (!record.amount.trim()) {
+      setError("음식 양을 입력해 주세요.");
+      return;
+    }
+    if (!selectedFood && !isManualMode) {
+      setError(
+        "검색 결과에서 음식을 선택하거나 목록에 없는 음식으로 계속해 주세요.",
+      );
+      return;
+    }
+
+    const recordToSave = isManualMode
+      ? {
+          ...record,
+          estimatedCalories: record.finalCalories,
+          confidence: "low" as const,
+          reason:
+            "칼로리 자료에 없는 음식으로 사용자가 직접 확인해 입력한 값입니다.",
+        }
+      : record;
+
     setSaving(true);
     setError("");
 
@@ -81,9 +109,9 @@ export default function RecordDetailPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...record,
-          estimateReason: record.reason,
-          recordedAt: new Date(record.recordedAt).toISOString(),
+          ...recordToSave,
+          estimateReason: recordToSave.reason,
+          recordedAt: new Date(recordToSave.recordedAt).toISOString(),
           recordedTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       });
@@ -102,6 +130,8 @@ export default function RecordDetailPage() {
   }
 
   const selectedFood = record ? findCalorieFood(record.foodName) : null;
+  const suggestions = record ? searchCalorieFoods(record.foodName) : [];
+  const isManualMode = manualEntry && !selectedFood;
   const catalogEstimate =
     record && selectedFood
       ? estimateMeal({
@@ -166,9 +196,52 @@ export default function RecordDetailPage() {
                 "사용자가 음식명을 수정했으며 최종 칼로리는 직접 확인한 값이에요.",
             });
             setCalorieMessage("");
+            setError("");
           }}
-          onSelect={() => setCalorieMessage("")}
+          onSelect={() => {
+            setManualEntry(false);
+            setCalorieMessage("");
+            setError("");
+          }}
+          noResultsMessage="칼로리 자료에서 일치하는 음식을 찾지 못했어요."
         />
+        {record.foodName.trim() &&
+          !selectedFood &&
+          suggestions.length === 0 &&
+          !manualEntry && (
+            <button
+              className="manual-entry-button"
+              type="button"
+              onClick={() => {
+                setManualEntry(true);
+                setRecord({
+                  ...record,
+                  confidence: "low",
+                  reason:
+                    "칼로리 자료에 없는 음식으로 사용자가 직접 확인해 입력한 값입니다.",
+                });
+                setCalorieMessage("");
+                setError("");
+              }}
+            >
+              목록에 없는 음식으로 계속
+            </button>
+          )}
+        {isManualMode && (
+          <section className="manual-entry-note" aria-label="직접 입력 음식 안내">
+            <p>자료에 없는 음식은 직접 확인한 칼로리로 수정할 수 있어요.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setManualEntry(false);
+                setCalorieMessage("");
+                setError("");
+              }}
+            >
+              CSV 음식 다시 검색
+            </button>
+          </section>
+        )}
         <label>음식 양<input value={record.amount} maxLength={30} onChange={(event) => {
           const amount = event.target.value;
           const detectedServings = parseServingMultiplier(amount);
@@ -186,8 +259,13 @@ export default function RecordDetailPage() {
             setCalculationServings(detectedServings);
           }
           setCalorieMessage("");
+          setError("");
         }} />
-          <small className="field-help">기존에 기록한 음식 양은 그대로 보존돼요.</small>
+          <small className="field-help">
+            {isManualMode
+              ? "영양표시에 해당하는 양을 입력해 주세요."
+              : "기존에 기록한 음식 양은 그대로 보존돼요."}
+          </small>
         </label>
         {selectedFood && (
           <>
@@ -231,10 +309,40 @@ export default function RecordDetailPage() {
             <option value="breakfast">아침</option><option value="lunch">점심</option><option value="dinner">저녁</option><option value="snack">간식</option>
           </select>
         </label>
-        <label>최종 칼로리<input type="number" min="0" max="10000" value={record.finalCalories} onChange={(event) => {
-          setRecord({ ...record, finalCalories: Number(event.target.value) });
-          setCalorieMessage("");
-        }} /></label>
+        <label>{isManualMode ? "직접 확인한 칼로리" : "최종 칼로리"}
+          <span className={isManualMode ? "calorie-input-wrap" : undefined}>
+            <input
+              type="number"
+              inputMode="numeric"
+              min="0"
+              max="10000"
+              step="1"
+              value={record.finalCalories}
+              onChange={(event) => {
+                const finalCalories = Number(event.target.value);
+                setRecord({
+                  ...record,
+                  estimatedCalories: isManualMode
+                    ? finalCalories
+                    : record.estimatedCalories,
+                  finalCalories,
+                  confidence: isManualMode ? "low" : record.confidence,
+                  reason: isManualMode
+                    ? "칼로리 자료에 없는 음식으로 사용자가 직접 확인해 입력한 값입니다."
+                    : record.reason,
+                });
+                setCalorieMessage("");
+                setError("");
+              }}
+            />
+            {isManualMode && <small>kcal</small>}
+          </span>
+          {isManualMode && (
+            <small className="field-help">
+              영양표시나 직접 확인한 값을 입력해 주세요.
+            </small>
+          )}
+        </label>
         <label>기록 날짜와 시간<input type="datetime-local" value={toLocalInputValue(record.recordedAt)} onChange={(event) => {
           const value = event.target.value;
           if (value) setRecord({ ...record, recordedAt: new Date(value).toISOString() });
