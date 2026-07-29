@@ -9,7 +9,7 @@ Calorie Calculator 앱의 개발 및 배포 환경에서 필요한 설정값을 
 ### 인증
 - NEXT_PUBLIC_SUPABASE_URL=
 - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-- NEXT_PUBLIC_APP_URL=http://localhost:3000
+- NEXT_PUBLIC_APP_URL=
 - SUPABASE_SERVICE_ROLE_KEY=
 
 ### 칼로리 추정
@@ -30,3 +30,5 @@ Calorie Calculator 앱의 개발 및 배포 환경에서 필요한 설정값을 
 - 브라우저에 노출되는 값은 `NEXT_PUBLIC_` 접두사를 사용한다.
 - 서버 전용 비밀값은 클라이언트 코드에서 직접 읽지 않는다.
 - 없는 값은 런타임에 명확한 오류로 안내한다.
+- `NEXT_PUBLIC_APP_URL`은 실행 중인 앱의 기준 주소다. 로컬과 배포 환경에 각각 맞는 값을 설정한다.
+- Vercel에서 이 값을 변경한 경우 새 배포를 실행해야 반영된다.

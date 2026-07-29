@@ -11,6 +11,7 @@
 - `ROUTES_AND_FLOWS.md`
 - `ENVIRONMENT.md`
 - `TEST_CHECKLIST.md`
+- `IMPLEMENTATION_HANDOVER.md` — 현재 구현·배포 상태와 다음 작업 우선순위
 
 ## 시작하기
 
