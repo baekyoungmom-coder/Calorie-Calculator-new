@@ -639,6 +639,26 @@ input:focus, textarea:focus { border-color: #66b8aa; box-shadow: 0 0 0 3px rgb(1
 .result-hero p, .result-hero small { color: #668389; opacity: 1; }
 .result-hero h1 { color: #438f85; font-size: 44px; }
 .confidence { background: #dff2ee; color: #397d72; }
+.guest-trial-status {
+  margin: 20px 0 12px;
+  padding: 11px 14px;
+  border: 1px solid #cfe7e3;
+  border-radius: 14px;
+  background: #e9f7f4;
+  color: #3e766e;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  text-align: center;
+}
+.trial-limit-state > span {
+  background: #fff0dc;
+  color: #c27643;
+  font-size: 22px;
+  font-weight: 900;
+}
+.trial-limit-state .text-link { display: inline-block; margin-top: 18px; }
+.trial-check-error > span { background: #fbecef; color: var(--danger); }
 .detail-card { border-color: #d8e8eb; box-shadow: 0 4px 12px rgb(65 117 125 / 5%); }
 .reason { background: #edf8f7; color: #557b7d; }
 

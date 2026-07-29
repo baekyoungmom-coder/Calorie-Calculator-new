@@ -2,7 +2,12 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { MealDraft, MealType, setDraft } from "@/lib/meals";
+import {
+  MealDraft,
+  MealType,
+  createTrialId,
+  setDraft,
+} from "@/lib/meals";
 
 type MealFormProps = {
   inputType: "text" | "photo";
@@ -36,6 +41,7 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
 
     setSubmitting(true);
     const draft: MealDraft = {
+      trialId: createTrialId(),
       inputType,
       foodName: foodName.trim() || "사진 속 음식",
       amount: amount.trim() || "양 확인 필요",

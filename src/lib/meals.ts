@@ -2,6 +2,7 @@ export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 export type InputType = "photo" | "text";
 
 export type MealDraft = {
+  trialId: string;
   inputType: InputType;
   foodName: string;
   amount: string;
@@ -71,13 +72,28 @@ export function estimateMeal(draft: MealDraft): Required<
 
 const DRAFT_KEY = "calorie-calculator-draft";
 
+export function createTrialId() {
+  return crypto.randomUUID();
+}
+
 export function setDraft(draft: MealDraft) {
   sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 }
 
 export function getDraft(): MealDraft | null {
   try {
-    return JSON.parse(sessionStorage.getItem(DRAFT_KEY) ?? "null") as MealDraft | null;
+    const draft = JSON.parse(
+      sessionStorage.getItem(DRAFT_KEY) ?? "null",
+    ) as MealDraft | null;
+    if (!draft) return null;
+
+    if (!draft.trialId) {
+      const migratedDraft = { ...draft, trialId: createTrialId() };
+      setDraft(migratedDraft);
+      return migratedDraft;
+    }
+
+    return draft;
   } catch {
     return null;
   }
