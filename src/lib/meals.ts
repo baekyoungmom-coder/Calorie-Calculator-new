@@ -7,6 +7,7 @@ import {
   searchPreparedCalorieCatalog,
 } from "@/lib/calorie-catalog";
 export type { CalorieFood } from "@/lib/calorie-catalog";
+export { parseServingMultiplier } from "@/lib/calorie-catalog";
 import type { CalorieFood } from "@/lib/calorie-catalog";
 
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
@@ -21,6 +22,7 @@ export type MealDraft = {
   memo: string;
   recordedAt: string;
   imageName?: string;
+  calorieSource?: "catalog" | "manual";
   estimatedCalories?: number;
   confidence?: "low" | "medium" | "high";
   reason?: string;

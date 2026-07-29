@@ -4,7 +4,13 @@ import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { FoodSearchField } from "@/components/FoodSearchField";
 import { Header } from "@/components/Header";
-import { estimateMeal, findCalorieFood, MealType } from "@/lib/meals";
+import {
+  estimateMeal,
+  findCalorieFood,
+  MealType,
+  parseServingMultiplier,
+  SERVING_OPTIONS,
+} from "@/lib/meals";
 
 type RecordDetail = {
   id: string;
@@ -35,6 +41,7 @@ export default function RecordDetailPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [calorieMessage, setCalorieMessage] = useState("");
+  const [calculationServings, setCalculationServings] = useState(1);
 
   useEffect(() => {
     async function load() {
@@ -45,7 +52,15 @@ export default function RecordDetailPage() {
           setError(payload.message ?? "기록을 불러오지 못했습니다.");
           return;
         }
-        setRecord(payload.data.record);
+        const loadedRecord = payload.data.record;
+        const detectedServings = parseServingMultiplier(loadedRecord.amount);
+        setRecord(loadedRecord);
+        setCalculationServings(
+          detectedServings !== null &&
+            SERVING_OPTIONS.some((option) => option === detectedServings)
+            ? detectedServings
+            : 1,
+        );
       } catch {
         setError("기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
       } finally {
@@ -93,7 +108,7 @@ export default function RecordDetailPage() {
           trialId: record.id,
           inputType: record.inputType === "photo" ? "photo" : "text",
           foodName: selectedFood.name,
-          amount: record.amount,
+          amount: `${calculationServings.toLocaleString("ko-KR")}인분`,
           mealType: record.mealType,
           memo: record.memo ?? "",
           recordedAt: record.recordedAt,
@@ -101,7 +116,7 @@ export default function RecordDetailPage() {
       : null;
 
   function applyCatalogCalories() {
-    if (!record || !catalogEstimate || catalogEstimate.servings === null) return;
+    if (!record || !catalogEstimate) return;
 
     setRecord({
       ...record,
@@ -155,32 +170,61 @@ export default function RecordDetailPage() {
           onSelect={() => setCalorieMessage("")}
         />
         <label>음식 양<input value={record.amount} maxLength={30} onChange={(event) => {
+          const amount = event.target.value;
+          const detectedServings = parseServingMultiplier(amount);
           setRecord({
             ...record,
-            amount: event.target.value,
+            amount,
             confidence: "low",
             reason:
               "사용자가 음식 양을 수정했으며 최종 칼로리는 직접 확인한 값이에요.",
           });
+          if (
+            detectedServings !== null &&
+            SERVING_OPTIONS.some((option) => option === detectedServings)
+          ) {
+            setCalculationServings(detectedServings);
+          }
           setCalorieMessage("");
         }} />
-          <small className="field-help">CSV 재계산은 0.5인분, 1인분처럼 입력하면 가장 명확해요.</small>
+          <small className="field-help">기존에 기록한 음식 양은 그대로 보존돼요.</small>
         </label>
         {selectedFood && (
-          <section className="calorie-recalculate" aria-label="CSV 칼로리 다시 계산">
-            <p>
-              음식명을 선택해도 현재 최종 칼로리는 유지돼요.
-            </p>
-            {catalogEstimate && catalogEstimate.servings !== null ? (
+          <>
+            <label>CSV 재계산 인분
+              <select
+                value={calculationServings}
+                onChange={(event) => {
+                  setCalculationServings(Number(event.target.value));
+                  setCalorieMessage("");
+                }}
+              >
+                {SERVING_OPTIONS.map((value) => (
+                  <option key={value} value={value}>
+                    {value.toLocaleString("ko-KR")}인분
+                  </option>
+                ))}
+              </select>
+              <small className="field-help">
+                기존 음식 양은 바꾸지 않고 계산 기준으로만 사용해요.
+              </small>
+            </label>
+            <section className="calorie-recalculate" aria-label="CSV 칼로리 다시 계산">
+              <p>
+                {selectedFood.name} 1인분{" "}
+                {Math.round(selectedFood.calories).toLocaleString()} kcal ×{" "}
+                {calculationServings.toLocaleString("ko-KR")}
+              </p>
+              {catalogEstimate && (
               <button type="button" onClick={applyCatalogCalories}>
                 계산값 {catalogEstimate.estimatedCalories.toLocaleString()} kcal 적용
               </button>
-            ) : (
+              )}
               <small>
-                음식 양을 인분 또는 개수 형식으로 바꾸면 계산값을 적용할 수 있어요.
+                적용 버튼을 누르기 전까지 현재 최종 칼로리는 유지돼요.
               </small>
-            )}
-          </section>
+            </section>
+          </>
         )}
         <label>식사 종류
           <select value={record.mealType} onChange={(event) => setRecord({ ...record, mealType: event.target.value as MealType })}>

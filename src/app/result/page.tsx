@@ -239,7 +239,11 @@ export default function ResultPage() {
         </p>
       )}
       <section className="result-hero">
-        <p>예상 섭취 칼로리</p>
+        <p>
+          {draft.calorieSource === "manual"
+            ? "직접 입력한 칼로리"
+            : "예상 섭취 칼로리"}
+        </p>
         {editing ? (
           <label className="calorie-edit">
             <input
@@ -256,8 +260,18 @@ export default function ResultPage() {
         ) : (
           <h1>{calories.toLocaleString()} <span>kcal</span></h1>
         )}
-        <span className={`confidence ${confidence}`}>신뢰도 {confidenceLabels[confidence]}</span>
-        <small>칼로리는 입력 정보를 바탕으로 한 추정치입니다.</small>
+        {draft.calorieSource === "manual" ? (
+          <span className="confidence manual">사용자 직접 입력</span>
+        ) : (
+          <span className={`confidence ${confidence}`}>
+            신뢰도 {confidenceLabels[confidence]}
+          </span>
+        )}
+        <small>
+          {draft.calorieSource === "manual"
+            ? "칼로리 자료에 없는 음식으로 직접 확인한 값입니다."
+            : "칼로리는 입력 정보를 바탕으로 한 추정치입니다."}
+        </small>
       </section>
       <section className="detail-card">
         <div>

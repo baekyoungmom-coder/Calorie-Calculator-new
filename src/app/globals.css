@@ -248,6 +248,50 @@ select {
   background: var(--green-pale);
   font-size: 10px;
 }
+.manual-entry-button {
+  min-height: 45px;
+  border: 1px dashed #76bdb1;
+  border-radius: 13px;
+  background: #f3fbf9;
+  color: #397f74;
+  cursor: pointer;
+  font-weight: 800;
+}
+.manual-entry-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fff5e8;
+}
+.manual-entry-note p {
+  margin: 0;
+  color: #87643e;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.manual-entry-note button {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: #8b6946;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+}
+.calorie-input-wrap { position: relative; }
+.calorie-input-wrap input { padding-right: 52px; text-align: right; }
+.calorie-input-wrap > small {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  color: var(--muted);
+  font-size: 11px;
+  transform: translateY(-50%);
+}
 .field-help, .food-search-help {
   color: var(--muted);
   font-size: 11px;
@@ -715,6 +759,7 @@ input:focus, textarea:focus, select:focus { border-color: #66b8aa; box-shadow: 0
 .result-hero p, .result-hero small { color: #668389; opacity: 1; }
 .result-hero h1 { color: #438f85; font-size: 44px; }
 .confidence { background: #dff2ee; color: #397d72; }
+.confidence.manual { background: #fff0dc; color: #9a6a3e; }
 .guest-trial-status {
   margin: 20px 0 12px;
   padding: 11px 14px;

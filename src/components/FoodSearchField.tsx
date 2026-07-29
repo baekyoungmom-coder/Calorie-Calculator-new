@@ -11,12 +11,14 @@ type FoodSearchFieldProps = {
   value: string;
   onChange: (value: string) => void;
   onSelect?: (food: CalorieFood) => void;
+  noResultsMessage?: string;
 };
 
 export function FoodSearchField({
   value,
   onChange,
   onSelect,
+  noResultsMessage = "일치하는 음식이 없어요. 다른 이름으로 검색해 주세요.",
 }: FoodSearchFieldProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsId = useId();
@@ -77,9 +79,7 @@ export function FoodSearchField({
         )}
       </div>
       {value && !selectedFood && suggestions.length === 0 && (
-        <small className="food-search-help">
-          일치하는 음식이 없어요. 다른 이름으로 검색해 주세요.
-        </small>
+        <small className="food-search-help">{noResultsMessage}</small>
       )}
       {selectedFood && (
         <p className="food-match" role="status">
