@@ -1,12 +1,12 @@
 "use client";
 
-import { FormEvent, useId, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FoodSearchField } from "@/components/FoodSearchField";
 import {
   findCalorieFood,
   MealDraft,
   MealType,
-  searchCalorieFoods,
   SERVING_OPTIONS,
   createTrialId,
   setDraft,
@@ -30,13 +30,7 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
   });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const suggestionsId = useId();
   const selectedFood = useMemo(() => findCalorieFood(foodName), [foodName]);
-  const suggestions = useMemo(
-    () => searchCalorieFoods(foodName),
-    [foodName],
-  );
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -66,70 +60,14 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
 
   return (
     <form className="form-stack" onSubmit={submit} noValidate>
-      <div className="food-search-field">
-        <label htmlFor={`${suggestionsId}-input`}>음식 이름</label>
-        <div className="food-search">
-          <input
-            id={`${suggestionsId}-input`}
-            value={foodName}
-            onChange={(event) => {
-              setFoodName(event.target.value);
-              setShowSuggestions(true);
-              setError("");
-            }}
-            onFocus={() => setShowSuggestions(true)}
-            onBlur={() => window.setTimeout(() => setShowSuggestions(false), 120)}
-            placeholder="예: 김밥, 된장찌개"
-            maxLength={60}
-            autoComplete="off"
-            role="combobox"
-            aria-autocomplete="list"
-            aria-expanded={showSuggestions && suggestions.length > 0}
-            aria-controls={suggestionsId}
-            required
-          />
-          {showSuggestions && suggestions.length > 0 && (
-            <div
-              className="food-suggestions"
-              id={suggestionsId}
-              role="listbox"
-              aria-label="음식 검색 결과"
-            >
-              {suggestions.map((food) => (
-                <button
-                  key={food.normalizedName}
-                  type="button"
-                  role="option"
-                  aria-selected={
-                    food.normalizedName === selectedFood?.normalizedName
-                  }
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => {
-                    setFoodName(food.name);
-                    setShowSuggestions(false);
-                    setError("");
-                  }}
-                >
-                  <span>{food.name}</span>
-                  <small>1인분 {Math.round(food.calories).toLocaleString()} kcal</small>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        {foodName && !selectedFood && suggestions.length === 0 && (
-          <small className="food-search-help">
-            일치하는 음식이 없어요. 다른 이름으로 검색해 주세요.
-          </small>
-        )}
-        {selectedFood && (
-          <p className="food-match" role="status">
-            <span>선택됨</span>
-            {selectedFood.name} · 1인분{" "}
-            {Math.round(selectedFood.calories).toLocaleString()} kcal
-          </p>
-        )}
-      </div>
+      <FoodSearchField
+        value={foodName}
+        onChange={(value) => {
+          setFoodName(value);
+          setError("");
+        }}
+        onSelect={() => setError("")}
+      />
       <label>
         섭취량
         <select

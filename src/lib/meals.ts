@@ -1,12 +1,13 @@
 import calorieCatalog from "@/generated/calorie-catalog.json";
 import {
-  CalorieFood,
   calculateServingCalories,
   findExactCalorieFood,
   parseServingMultiplier,
   prepareCalorieCatalog,
   searchPreparedCalorieCatalog,
 } from "@/lib/calorie-catalog";
+export type { CalorieFood } from "@/lib/calorie-catalog";
+import type { CalorieFood } from "@/lib/calorie-catalog";
 
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 export type InputType = "photo" | "text";
