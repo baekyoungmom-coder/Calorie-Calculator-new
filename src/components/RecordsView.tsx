@@ -35,6 +35,11 @@ type ApiResponse = {
 };
 
 type RecordRange = "week" | "all";
+const DELETE_ALL_CONFIRMATION = "전체 삭제";
+
+function isDeleteAllConfirmed(value: string) {
+  return value.trim().replace(/\s+/g, " ") === DELETE_ALL_CONFIRMATION;
+}
 
 function getLocalDayKey(date: Date) {
   const year = date.getFullYear();
@@ -160,6 +165,7 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
   const highestDailyTotal = Math.max(...dailyTotals.map((day) => day.calories), 0);
   const displayedRecords =
     mode === "all" && recordRange === "week" ? weekRecords : records;
+  const deleteAllConfirmed = isDeleteAllConfirmed(deleteAllPhrase);
 
   function retryLoad() {
     setReady(false);
@@ -186,7 +192,7 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
   }
 
   async function removeAll() {
-    if (deleteAllPhrase !== "전체 삭제" || deleteAllBusy) return;
+    if (!deleteAllConfirmed || deleteAllBusy) return;
 
     setDeleteAllBusy(true);
     setDataActionError("");
@@ -427,7 +433,7 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
             <div className="delete-all-confirm">
               <strong>삭제한 기록은 되돌릴 수 없어요.</strong>
               <label htmlFor="delete-all-phrase">
-                계속하려면 <b>전체 삭제</b>를 입력해 주세요.
+                계속하려면 <b>{DELETE_ALL_CONFIRMATION}</b>를 입력해 주세요.
               </label>
               <input
                 id="delete-all-phrase"
@@ -437,13 +443,16 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
                 autoComplete="off"
                 disabled={deleteAllBusy}
               />
+              <p className={`delete-all-status ${deleteAllConfirmed ? "confirmed" : ""}`} aria-live="polite">
+                {deleteAllConfirmed ? "삭제 확인 문구가 입력되었습니다." : `확인 문구: ${DELETE_ALL_CONFIRMATION}`}
+              </p>
               {dataActionError && <p role="alert">{dataActionError}</p>}
               <div>
                 <button
                   className="delete-all-submit"
                   type="button"
                   onClick={removeAll}
-                  disabled={deleteAllPhrase !== "전체 삭제" || deleteAllBusy}
+                  disabled={!deleteAllConfirmed || deleteAllBusy}
                 >
                   {deleteAllBusy ? "삭제하는 중…" : "모든 기록 삭제"}
                 </button>

@@ -2521,6 +2521,11 @@ input, textarea, select {
   line-height: 1.5;
 }
 .delete-all-confirm > p { color: #a34f4b; }
+.delete-all-confirm > p.delete-all-status {
+  color: #806c6e;
+  font-weight: 700;
+}
+.delete-all-confirm > p.delete-all-status.confirmed { color: #2f8075; }
 .delete-all-confirm input {
   width: 100%;
   min-height: 44px;
