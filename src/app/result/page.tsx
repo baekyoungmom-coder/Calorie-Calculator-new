@@ -11,7 +11,9 @@ import {
   clearDraft,
   estimateMeal,
   getDraft,
+  setDraft,
 } from "@/lib/meals";
+import { resolveResultCalories } from "@/lib/result-draft";
 
 const confidenceLabels = { low: "낮음", medium: "보통", high: "높음" };
 
@@ -46,6 +48,8 @@ export default function ResultPage() {
   const [trialAccess, setTrialAccess] = useState<TrialAccess>({ status: "checking" });
   const [trialCheckVersion, setTrialCheckVersion] = useState(0);
   const [editing, setEditing] = useState(false);
+  const [editSnapshot, setEditSnapshot] = useState<MealDraft | null>(null);
+  const [editMessage, setEditMessage] = useState("");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -184,9 +188,66 @@ export default function ResultPage() {
     );
   }
 
-  const calories = draft.estimatedCalories ?? estimate.estimatedCalories;
+  const {
+    estimatedCalories,
+    finalCalories: calories,
+  } = resolveResultCalories(draft, estimate.estimatedCalories);
   const confidence = draft.confidence ?? estimate.confidence;
   const reason = draft.reason ?? estimate.reason;
+  const hasUserFinalCalories = draft.finalCalories !== undefined;
+
+  function beginEditing() {
+    if (!draft) return;
+
+    setEditSnapshot({ ...draft });
+    setEditing(true);
+    setEditMessage("");
+    setSaveError("");
+  }
+
+  function completeEditing() {
+    if (!draft) return;
+
+    if (!draft.foodName.trim()) {
+      setSaveError("음식 이름을 입력해 주세요.");
+      return;
+    }
+    if (!draft.amount.trim()) {
+      setSaveError("음식 양을 입력해 주세요.");
+      return;
+    }
+    if (
+      !Number.isInteger(calories) ||
+      calories < 0 ||
+      calories > 10000
+    ) {
+      setSaveError("최종 칼로리를 0~10,000 사이의 정수로 입력해 주세요.");
+      return;
+    }
+
+    const confirmedDraft = {
+      ...draft,
+      foodName: draft.foodName.trim(),
+      amount: draft.amount.trim(),
+      finalCalories: calories,
+    };
+    setDraftState(confirmedDraft);
+    setDraft(confirmedDraft);
+    setEditSnapshot(null);
+    setEditing(false);
+    setEditMessage("수정 내용을 최종값에 반영했어요.");
+    setSaveError("");
+  }
+
+  function cancelEditing() {
+    if (editSnapshot) {
+      setDraftState(editSnapshot);
+    }
+    setEditSnapshot(null);
+    setEditing(false);
+    setEditMessage("");
+    setSaveError("");
+  }
 
   async function save() {
     if (!draft) return;
@@ -204,7 +265,7 @@ export default function ResultPage() {
           foodName: draft.foodName,
           amount: draft.amount,
           memo: draft.memo,
-          estimatedCalories: draft.estimatedCalories ?? estimateMeal(draft).estimatedCalories,
+          estimatedCalories,
           finalCalories: calories,
           confidence,
           estimateReason: reason,
@@ -250,7 +311,9 @@ export default function ResultPage() {
         <p>
           {draft.calorieSource === "manual"
             ? "직접 입력한 칼로리"
-            : "예상 섭취 칼로리"}
+            : hasUserFinalCalories
+              ? "최종 섭취 칼로리"
+              : "예상 섭취 칼로리"}
         </p>
         {editing ? (
           <label className="calorie-edit">
@@ -260,7 +323,10 @@ export default function ResultPage() {
               max="10000"
               value={calories}
               onChange={(event) =>
-                setDraftState({ ...draft, estimatedCalories: Number(event.target.value) })
+                setDraftState({
+                  ...draft,
+                  finalCalories: Number(event.target.value),
+                })
               }
             />
             <span>kcal</span>
@@ -270,6 +336,8 @@ export default function ResultPage() {
         )}
         {draft.calorieSource === "manual" ? (
           <span className="confidence manual">사용자 직접 입력</span>
+        ) : hasUserFinalCalories ? (
+          <span className="confidence manual">사용자 수정</span>
         ) : (
           <span className={`confidence ${confidence}`}>
             신뢰도 {confidenceLabels[confidence]}
@@ -278,20 +346,34 @@ export default function ResultPage() {
         <small>
           {draft.calorieSource === "manual"
             ? "칼로리 자료에 없는 음식으로 직접 확인한 값입니다."
-            : "칼로리는 입력 정보를 바탕으로 한 추정치입니다."}
+            : hasUserFinalCalories
+              ? `원래 추정 ${estimatedCalories.toLocaleString()} kcal를 보존하고 사용자가 확인한 최종값을 표시합니다.`
+              : "칼로리는 입력 정보를 바탕으로 한 추정치입니다."}
         </small>
       </section>
       <section className="detail-card">
         <div>
           <span>음식</span>
           {editing ? (
-            <input value={draft.foodName} onChange={(event) => setDraftState({ ...draft, foodName: event.target.value })} />
+            <input
+              value={draft.foodName}
+              maxLength={60}
+              onChange={(event) =>
+                setDraftState({ ...draft, foodName: event.target.value })
+              }
+            />
           ) : <strong>{draft.foodName}</strong>}
         </div>
         <div>
           <span>양</span>
           {editing ? (
-            <input value={draft.amount} onChange={(event) => setDraftState({ ...draft, amount: event.target.value })} />
+            <input
+              value={draft.amount}
+              maxLength={30}
+              onChange={(event) =>
+                setDraftState({ ...draft, amount: event.target.value })
+              }
+            />
           ) : <strong>{draft.amount}</strong>}
         </div>
         <div><span>식사</span><strong>{MEAL_LABELS[draft.mealType]}</strong></div>
@@ -308,15 +390,16 @@ export default function ResultPage() {
         <div><span>기록 시간</span><strong>{new Date(draft.recordedAt).toLocaleString("ko-KR")}</strong></div>
       </section>
       <p className="reason"><span aria-hidden="true">i</span>{reason}</p>
+      {editMessage && <p className="success" role="status">{editMessage}</p>}
       {saved && <p className="success" role="status">기록을 저장했어요. 오늘 기록으로 이동합니다.</p>}
       {saveError && <p className="error" role="alert">{saveError}</p>}
       {requiresLogin && <Link className="secondary-button" href="/login?next=/result">로그인하고 저장하기</Link>}
       <div className="action-stack">
-        <button className="primary-button" type="button" onClick={editing ? () => setEditing(false) : save} disabled={saved || saving}>
+        <button className="primary-button" type="button" onClick={editing ? completeEditing : save} disabled={saved || saving}>
           {editing ? "수정 완료" : saved ? "저장 완료" : saving ? "저장 중…" : "이 기록 저장하기"}
         </button>
         {!saved && (
-          <button className="secondary-button" type="button" onClick={() => setEditing(!editing)}>
+          <button className="secondary-button" type="button" onClick={editing ? cancelEditing : beginEditing}>
             {editing ? "수정 취소" : "결과 수정하기"}
           </button>
         )}

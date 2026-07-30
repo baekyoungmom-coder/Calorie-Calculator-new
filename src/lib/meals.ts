@@ -24,6 +24,7 @@ export type MealDraft = {
   imageName?: string;
   calorieSource?: "catalog" | "manual";
   estimatedCalories?: number;
+  finalCalories?: number;
   confidence?: "low" | "medium" | "high";
   reason?: string;
 };
