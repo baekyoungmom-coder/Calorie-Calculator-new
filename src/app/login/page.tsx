@@ -62,6 +62,9 @@ export default async function LoginPage({
           게스트로 계속하기
         </Link>
         <small className="auth-note">로그인 없이도 칼로리 계산을 3회 체험할 수 있어요.</small>
+        <Link className="auth-privacy-link" href="/privacy">
+          개인정보·데이터 이용 안내
+        </Link>
       </section>
     </main>
   );

@@ -2246,3 +2246,185 @@ input, textarea, select {
     padding-left: 34px;
   }
 }
+
+.profile-actions {
+  display: grid;
+  justify-items: stretch;
+  gap: 7px;
+}
+.profile-actions form { margin: 0; }
+.profile-logout-button,
+.profile-login-link {
+  width: 100%;
+  min-height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 58%);
+  color: #80675c;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 2px 3px 6px rgb(111 88 54 / 11%), -2px -2px 5px rgb(255 255 255 / 80%);
+}
+.data-guide {
+  margin: 0 0 26px;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #f9ffff, #deefed);
+  color: #4f7076;
+  box-shadow: 6px 8px 13px rgb(55 112 111 / 12%), -4px -4px 10px #fff;
+}
+.data-guide summary {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+.data-guide summary::-webkit-details-marker { display: none; }
+.data-guide summary::after {
+  content: "+";
+  margin-left: auto;
+  font-size: 22px;
+  font-weight: 500;
+}
+.data-guide[open] summary::after { content: "−"; }
+.data-guide summary > span {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  background: #fff;
+  color: #4e9d92;
+  box-shadow: 3px 4px 7px rgb(51 105 101 / 14%);
+}
+.data-guide summary strong { font-size: 14px; }
+.data-guide > div {
+  padding: 0 17px 17px;
+  border-top: 1px solid rgb(117 165 161 / 18%);
+}
+.data-guide p,
+.data-guide li {
+  color: #657e83;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.data-guide ul { margin: 0 0 13px; padding-left: 19px; }
+.data-guide a { color: #3e8d82; font-size: 12px; font-weight: 900; }
+.auth-privacy-link {
+  display: block;
+  margin-top: 12px;
+  color: #668187;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.privacy-page { padding-bottom: 48px; }
+.privacy-highlight,
+.privacy-section,
+.privacy-draft-note {
+  margin-top: 20px;
+  padding: 22px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #fbffff, #e6f3f1);
+  color: #385c63;
+  box-shadow: 7px 9px 15px rgb(55 112 111 / 13%), -5px -5px 11px #fff;
+}
+.privacy-highlight {
+  background: linear-gradient(145deg, #d9f3ee, #bee5dc 60%, #d5edf4);
+}
+.privacy-highlight > p,
+.privacy-section > p {
+  margin: 0 0 6px;
+  color: #4b9b90;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.privacy-highlight h1,
+.privacy-section h2,
+.privacy-draft-note h2 {
+  margin: 0 0 15px;
+  color: #214d57;
+  font-size: 21px;
+}
+.privacy-highlight ul,
+.privacy-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.privacy-highlight li,
+.privacy-section li,
+.privacy-section dd,
+.privacy-draft-note p {
+  color: #5e777d;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.privacy-section dl { margin: 0; }
+.privacy-section dl > div {
+  padding: 14px 0;
+  border-top: 1px solid rgb(108 157 154 / 17%);
+}
+.privacy-section dl > div:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.privacy-section dt {
+  margin-bottom: 5px;
+  color: #355f66;
+  font-size: 14px;
+  font-weight: 900;
+}
+.privacy-section dd { margin: 0; }
+.privacy-draft-note {
+  background: linear-gradient(145deg, #fff8eb, #f0ddbd);
+  box-shadow: 7px 9px 15px rgb(120 94 52 / 12%), -5px -5px 11px #fff;
+}
+.privacy-draft-note h2 { font-size: 18px; }
+.privacy-draft-note p { margin: 0; }
+.privacy-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 22px 4px 0;
+  color: #768b8f;
+  font-size: 12px;
+}
+.privacy-footer a { color: #3d8b81; font-weight: 900; }
+
+@media (max-width: 560px) {
+  .mypage-page .profile-card {
+    grid-template-columns: 50px minmax(0, 1fr);
+  }
+  .profile-actions {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .profile-logout-button,
+  .profile-login-link,
+  .profile-record-link {
+    min-height: 38px;
+    justify-content: center;
+  }
+  .privacy-highlight,
+  .privacy-section,
+  .privacy-draft-note {
+    padding: 19px 17px;
+    border-radius: 19px;
+  }
+  .privacy-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
