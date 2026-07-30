@@ -1268,6 +1268,150 @@ input:focus, textarea:focus, select:focus { border-color: #66b8aa; box-shadow: 0
   .record-steps { margin-bottom: 17px; }
 }
 
+/* 입력 화면의 조작 요소도 첫 화면의 둥근 클레이 버튼 언어로 통일한다. */
+.text-record-page .back-link,
+.photo-record-page .back-link,
+.record-edit-page .back-link,
+.text-record-page .home-link,
+.photo-record-page .home-link,
+.record-edit-page .home-link {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #faffff, #d5eef0 62%, #b9dde2);
+  box-shadow:
+    5px 7px 12px rgb(50 119 124 / 24%),
+    -4px -4px 9px rgb(255 255 255 / 92%),
+    inset 2px 2px 3px rgb(255 255 255 / 78%),
+    inset -2px -3px 4px rgb(58 128 133 / 11%);
+  color: #4b939d;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.text-record-page .back-link:hover,
+.photo-record-page .back-link:hover,
+.record-edit-page .back-link:hover,
+.text-record-page .home-link:hover,
+.photo-record-page .home-link:hover,
+.record-edit-page .home-link:hover {
+  background: linear-gradient(145deg, #fff, #c9e9eb 62%, #aad6da);
+  box-shadow:
+    7px 9px 14px rgb(50 119 124 / 27%),
+    -4px -4px 9px #fff,
+    inset 2px 2px 3px rgb(255 255 255 / 80%);
+  transform: translateY(-2px);
+}
+
+.text-record-page .back-link:active,
+.photo-record-page .back-link:active,
+.record-edit-page .back-link:active,
+.text-record-page .home-link:active,
+.photo-record-page .home-link:active,
+.record-edit-page .home-link:active {
+  box-shadow:
+    inset 3px 3px 6px rgb(44 109 114 / 20%),
+    inset -2px -2px 5px rgb(255 255 255 / 78%);
+  transform: translateY(1px) scale(.97);
+}
+
+.page-hero-icon,
+.form-card-heading > span,
+.photo-record-page .upload-icon {
+  border: 0;
+  box-shadow:
+    6px 8px 13px rgb(42 105 100 / 30%),
+    -4px -4px 9px rgb(255 255 255 / 88%),
+    inset 2px 2px 3px rgb(255 255 255 / 43%),
+    inset -2px -3px 4px rgb(39 105 98 / 16%);
+}
+
+.page-hero-icon {
+  border-radius: 50%;
+}
+
+.text-record-page .page-hero-icon,
+.text-record-page .form-card-heading > span {
+  color: #fff;
+}
+
+.photo-record-page .upload-icon {
+  border-radius: 50%;
+}
+
+.photo-record-page .upload-button,
+.text-record-page .primary-button,
+.photo-record-page .primary-button,
+.record-edit-page .primary-button {
+  min-height: 58px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #89d5c6 0%, #58b4a4 52%, #3b9588 100%);
+  box-shadow:
+    7px 9px 14px rgb(36 103 96 / 32%),
+    -4px -4px 9px rgb(255 255 255 / 86%),
+    inset 2px 2px 3px rgb(255 255 255 / 35%),
+    inset -2px -3px 5px rgb(25 90 83 / 21%);
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.photo-record-page .upload-button:hover,
+.text-record-page .primary-button:hover,
+.photo-record-page .primary-button:hover,
+.record-edit-page .primary-button:hover {
+  background: linear-gradient(145deg, #9be1d2 0%, #62bfae 52%, #419b8d 100%);
+  box-shadow:
+    9px 11px 16px rgb(36 103 96 / 35%),
+    -4px -4px 9px #fff,
+    inset 2px 2px 3px rgb(255 255 255 / 40%);
+  transform: translateY(-2px);
+}
+
+.photo-record-page .upload-button:active,
+.text-record-page .primary-button:active,
+.photo-record-page .primary-button:active,
+.record-edit-page .primary-button:active {
+  box-shadow:
+    inset 3px 3px 6px rgb(27 92 84 / 27%),
+    inset -2px -2px 5px rgb(255 255 255 / 34%);
+  transform: translateY(1px) scale(.985);
+}
+
+.text-record-page input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.photo-record-page input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.record-edit-page input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  width: 28px;
+  height: 28px;
+  margin: -5px -4px -5px 8px;
+  padding: 5px;
+  border-radius: 50%;
+  background-color: #e4f6f3;
+  box-shadow:
+    3px 4px 7px rgb(48 117 111 / 18%),
+    -2px -2px 5px #fff,
+    inset 1px 1px 2px rgb(255 255 255 / 72%);
+  cursor: pointer;
+  opacity: .82;
+}
+
+@media (max-width: 560px) {
+  .text-record-page .back-link,
+  .photo-record-page .back-link,
+  .record-edit-page .back-link,
+  .text-record-page .home-link,
+  .photo-record-page .home-link,
+  .record-edit-page .home-link {
+    width: 42px;
+    height: 42px;
+  }
+
+  .photo-record-page .upload-button,
+  .text-record-page .primary-button,
+  .photo-record-page .primary-button,
+  .record-edit-page .primary-button {
+    min-height: 54px;
+    border-radius: 19px;
+  }
+}
+
 /* 모든 기록 화면에서 같은 아이콘·카드 언어를 사용한다. */
 .back-link, .home-link {
   width: 42px;
@@ -2650,4 +2794,28 @@ input, textarea, select {
     align-items: flex-start;
     flex-direction: column;
   }
+}
+
+/* 앞서 정의한 공통 카드 규칙보다 우선해, 입력 화면 아이콘의 클레이 질감을 유지한다. */
+.text-record-page .page-hero-icon,
+.photo-record-page .page-hero-icon,
+.record-edit-page .page-hero-icon {
+  border-radius: 50%;
+  box-shadow:
+    6px 8px 13px rgb(42 105 100 / 30%),
+    -4px -4px 9px rgb(255 255 255 / 88%),
+    inset 2px 2px 3px rgb(255 255 255 / 43%),
+    inset -2px -3px 4px rgb(39 105 98 / 16%);
+}
+
+.text-record-page .form-card-heading > span,
+.photo-record-page .form-card-heading > span,
+.record-edit-page .form-card-heading > span,
+.photo-record-page .upload-icon {
+  border-radius: 50%;
+  box-shadow:
+    6px 8px 13px rgb(42 105 100 / 30%),
+    -4px -4px 9px rgb(255 255 255 / 88%),
+    inset 2px 2px 3px rgb(255 255 255 / 43%),
+    inset -2px -3px 4px rgb(39 105 98 / 16%);
 }
