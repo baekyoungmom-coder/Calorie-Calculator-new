@@ -2970,3 +2970,91 @@ input, textarea, select {
   .bottom-nav-icon { width: 39px; height: 39px; border-radius: 14px; }
   .bottom-nav-icon img { width: 35px; height: 35px; }
 }
+
+/* 카드 안의 작은 안내 아이콘도 크기를 절제한 클레이 오브제로 맞춘다. */
+.mypage-page .page-hero-icon img {
+  transform: scale(1.01);
+}
+
+.mypage-page .avatar {
+  width: 58px;
+  height: 58px;
+  align-self: center;
+}
+
+.mypage-page .profile-card {
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+}
+
+.mypage-page .avatar img {
+  width: 56px;
+  height: 56px;
+  filter: drop-shadow(2px 4px 3px rgb(51 101 95 / 21%));
+}
+
+.data-guide summary > span {
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  background:
+    url("/images/ui/clay-notepad.png") center / 46px no-repeat,
+    linear-gradient(145deg, #faffff, #dff2ef);
+  box-shadow:
+    4px 6px 9px rgb(51 105 101 / 18%),
+    -3px -3px 7px #fff,
+    inset 1px 1px 2px rgb(255 255 255 / 74%);
+}
+
+.data-guide summary > span svg { display: none; }
+
+.goal-card-label > span,
+.summary-card-icon {
+  background:
+    url("/images/ui/clay-calendar.png") center / 46px no-repeat,
+    linear-gradient(145deg, #f4fffd, #b7e4da) !important;
+  color: transparent;
+  box-shadow:
+    5px 7px 10px rgb(43 105 99 / 24%),
+    -4px -4px 8px rgb(255 255 255 / 84%),
+    inset 2px 2px 3px rgb(255 255 255 / 48%);
+}
+
+.goal-card-label > span {
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
+}
+
+.summary-card-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  background-size: 60px;
+}
+
+.goal-card-label > span svg,
+.summary-card-icon svg { display: none; }
+
+.bottom-nav-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+}
+
+.bottom-nav-icon img {
+  width: 34px;
+  height: 34px;
+}
+
+.bottom-nav a.active .bottom-nav-icon {
+  transform: translateY(-3px) scale(1.03);
+}
+
+@media (max-width: 560px) {
+  .mypage-page .profile-card { grid-template-columns: 54px minmax(0, 1fr); }
+  .mypage-page .avatar { width: 54px; height: 54px; }
+  .mypage-page .avatar img { width: 53px; height: 53px; }
+  .data-guide summary > span { width: 40px; height: 40px; background-size: 42px, auto; }
+  .goal-card-label > span { width: 38px; height: 38px; background-size: 41px, auto; }
+  .summary-card-icon { width: 54px; height: 54px; background-size: 56px; }
+}
