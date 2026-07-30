@@ -282,6 +282,37 @@ GET /api/me
 }
 ```
 
+## 7.1 회원 탈퇴
+
+### 앱 내부 Route
+
+DELETE /api/account
+
+### 목적
+
+현재 로그인한 사용자의 Auth 계정과 연결 데이터를 영구 삭제하고 현재 세션을 정리한다.
+요청에는 정확한 확인 문구와 삭제 동의가 모두 포함되어야 한다.
+
+### 요청 예시
+
+```json
+{
+  "confirmation": "회원 탈퇴",
+  "acknowledged": true
+}
+```
+
+### 응답 예시
+
+```json
+{
+  "success": true,
+  "data": {
+    "deleted": true
+  }
+}
+```
+
 ## 8. 관리자 통계
 
 ### 앱 내부 Route

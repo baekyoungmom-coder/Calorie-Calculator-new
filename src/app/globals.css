@@ -2421,6 +2421,125 @@ input, textarea, select {
   font-weight: 800;
   text-align: center;
 }
+.account-deletion-card {
+  display: grid;
+  gap: 15px;
+  margin: 24px 0 100px;
+  padding: 20px;
+  border: 1px solid rgb(156 86 82 / 22%);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fff9f6, #efdeda);
+  color: #6e5659;
+  box-shadow: 6px 8px 13px rgb(111 75 70 / 11%), -4px -4px 10px #fff;
+}
+.account-deletion-card > div:first-child > p {
+  margin: 0 0 5px;
+  color: #a15f5b;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+.account-deletion-card h2 {
+  margin: 0 0 7px;
+  color: #68474a;
+  font-size: 18px;
+}
+.account-deletion-card small {
+  color: #80696c;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.account-deletion-open,
+.account-deletion-submit,
+.account-deletion-cancel {
+  min-height: 42px;
+  border-radius: 13px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+}
+.account-deletion-open {
+  border: 1px solid rgb(156 86 82 / 36%);
+  background: rgb(255 255 255 / 66%);
+  color: #965552;
+}
+.account-deletion-confirm {
+  display: grid;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid rgb(156 86 82 / 19%);
+}
+.account-deletion-confirm > strong {
+  color: #8d4c48;
+  font-size: 14px;
+}
+.account-deletion-confirm ul {
+  margin: 0;
+  padding-left: 19px;
+  color: #7d6669;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.account-deletion-confirm > label:not(.account-deletion-check),
+.account-deletion-confirm > p {
+  margin: 0;
+  color: #7d6669;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.account-deletion-confirm > p { color: #a34643; }
+.account-deletion-confirm > input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid rgb(156 86 82 / 30%);
+  border-radius: 13px;
+  outline: none;
+  background: rgb(255 255 255 / 76%);
+  color: #543f42;
+  font: inherit;
+}
+.account-deletion-confirm > input:focus {
+  border-color: #ad6762;
+  box-shadow: 0 0 0 3px rgb(173 103 98 / 12%);
+}
+.account-deletion-check {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: start;
+  gap: 8px;
+  padding: 11px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 54%);
+  color: #755e61;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.account-deletion-check input {
+  width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+  accent-color: #a45d58;
+}
+.account-deletion-actions {
+  display: grid;
+  grid-template-columns: 1fr 92px;
+  gap: 9px;
+}
+.account-deletion-submit {
+  border: 0;
+  background: #9c514e;
+  color: #fff;
+}
+.account-deletion-submit:disabled {
+  cursor: not-allowed;
+  opacity: .42;
+}
+.account-deletion-cancel {
+  border: 1px solid rgb(129 106 108 / 22%);
+  background: rgb(255 255 255 / 62%);
+  color: #746165;
+}
 .auth-privacy-link {
   display: block;
   margin-top: 12px;

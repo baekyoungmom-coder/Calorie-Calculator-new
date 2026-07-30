@@ -7,9 +7,9 @@ import { signInWithGoogle } from "./actions";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; next?: string }>;
+  searchParams: Promise<{ account?: string; error?: string; next?: string }>;
 }) {
-  const { error, next } = await searchParams;
+  const { account, error, next } = await searchParams;
   const safeNext = next?.startsWith("/") && !next.startsWith("//") ? next : "/";
 
   return (
@@ -36,6 +36,9 @@ export default async function LoginPage({
           <li><AppIcon name="clipboard" size={18} /> 저장한 식사 기록 관리</li>
           <li><AppIcon name="history" size={18} /> 최근 7일 섭취 흐름 확인</li>
         </ul>
+        {account === "deleted" && (
+          <p className="success">회원 탈퇴가 완료되었습니다.</p>
+        )}
         {error === "missing-config" && (
           <p className="error">Supabase 환경변수 설정이 필요합니다.</p>
         )}

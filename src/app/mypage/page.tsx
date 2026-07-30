@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppIcon } from "@/components/AppIcon";
 import { PageHero } from "@/components/PageHero";
 import { signOut } from "@/app/login/actions";
+import { AccountDeletionCard } from "@/components/AccountDeletionCard";
 
 export default async function MyPage() {
   const supabase = await createClient();
@@ -67,6 +68,7 @@ export default async function MyPage() {
         </div>
       </details>
       <RecordsView mode="all" />
+      {user && <AccountDeletionCard />}
       <BottomNav />
     </main>
   );
