@@ -332,6 +332,28 @@ fieldset { padding: 0; margin: 0; border: 0; }
 .error, .success { border-radius: 12px; padding: 12px 14px; margin: 0; font-size: 13px; }
 .error { color: var(--danger); background: #faecea; }
 .success { color: var(--green-dark); background: var(--green-pale); }
+.inline-recovery {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 11px 13px;
+  border-radius: 13px;
+  background: #faecea;
+  color: var(--danger);
+  font-size: 13px;
+}
+.inline-recovery p { flex: 1; margin: 0; }
+.inline-recovery button {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 800;
+}
 
 .upload-box {
   position: relative;
@@ -886,6 +908,7 @@ input:focus, textarea:focus, select:focus { border-color: #66b8aa; box-shadow: 0
 }
 .goal-card > .error { color: var(--danger); }
 .goal-card > .success { color: #347c70; }
+.goal-recovery .primary-button { margin-top: 18px; }
 
 .weekly-stats {
   display: grid;

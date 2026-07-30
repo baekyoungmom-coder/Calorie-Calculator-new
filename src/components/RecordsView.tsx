@@ -76,6 +76,7 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const [needsLogin, setNeedsLogin] = useState(false);
+  const [loadVersion, setLoadVersion] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -85,6 +86,10 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
       : "/api/meal-records";
 
     async function load() {
+      setReady(false);
+      setError("");
+      setNeedsLogin(false);
+
       try {
         const response = await fetch(url, { signal: controller.signal });
         const payload = (await response.json()) as ApiResponse;
@@ -94,6 +99,8 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
           return;
         }
         setRecords(payload.data?.records ?? []);
+        setError("");
+        setNeedsLogin(false);
       } catch (loadError) {
         if ((loadError as Error).name !== "AbortError") {
           setError("기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
@@ -105,7 +112,7 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
 
     void load();
     return () => controller.abort();
-  }, [mode]);
+  }, [loadVersion, mode]);
 
   const total = useMemo(
     () => records.reduce((sum, record) => sum + record.finalCalories, 0),
@@ -145,6 +152,13 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
   const displayedRecords =
     mode === "all" && recordRange === "week" ? weekRecords : records;
 
+  function retryLoad() {
+    setReady(false);
+    setError("");
+    setNeedsLogin(false);
+    setLoadVersion((version) => version + 1);
+  }
+
   async function remove(id: string) {
     if (!window.confirm("이 기록을 삭제할까요?")) return;
     setError("");
@@ -152,6 +166,7 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
       const response = await fetch(`/api/meal-records/${id}`, { method: "DELETE" });
       const payload = (await response.json()) as ApiResponse;
       if (!response.ok) {
+        setNeedsLogin(payload.error?.code === "UNAUTHORIZED");
         setError(payload.message || "기록을 삭제하지 못했습니다.");
         return;
       }
@@ -161,19 +176,37 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
     }
   }
 
-  if (!ready) return <p className="status-message">기록을 불러오고 있어요…</p>;
+  if (!ready) {
+    return (
+      <p className="status-message" role="status" aria-live="polite">
+        기록을 불러오고 있어요…
+      </p>
+    );
+  }
 
   if (needsLogin) {
+    const next = mode === "today" ? "/today" : "/mypage";
+
     return (
-      <>
-        {error && <p className="error" role="alert">{error}</p>}
-        <section className="empty-state">
-          <span aria-hidden="true">○</span>
-          <h2>로그인하고 기록을 관리하세요</h2>
-          <p>저장한 식사 기록은 로그인한 계정에서만 볼 수 있어요.</p>
-          <Link className="primary-button" href="/login">로그인하기</Link>
-        </section>
-      </>
+      <section className="empty-state">
+        <span aria-hidden="true">○</span>
+        <h2>로그인하고 기록을 관리하세요</h2>
+        <p role="alert">{error || "저장한 식사 기록은 로그인한 계정에서만 볼 수 있어요."}</p>
+        <Link className="primary-button" href={`/login?next=${next}`}>로그인하기</Link>
+      </section>
+    );
+  }
+
+  if (error && records.length === 0) {
+    return (
+      <section className="empty-state">
+        <span aria-hidden="true">!</span>
+        <h2>기록을 불러오지 못했어요</h2>
+        <p role="alert">{error}</p>
+        <button className="primary-button" type="button" onClick={retryLoad}>
+          다시 시도하기
+        </button>
+      </section>
     );
   }
 
@@ -194,7 +227,12 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
         <CalorieGoalCard todayCalories={dailyTotals.at(-1)?.calories ?? 0} />
       )}
 
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && (
+        <div className="inline-recovery">
+          <p role="alert">{error}</p>
+          <button type="button" onClick={retryLoad}>다시 불러오기</button>
+        </div>
+      )}
 
       {mode === "all" && (
         <>

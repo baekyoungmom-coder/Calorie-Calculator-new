@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { FoodSearchField } from "@/components/FoodSearchField";
@@ -43,17 +44,34 @@ export default function RecordDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [errorCode, setErrorCode] = useState("");
+  const [requiresLogin, setRequiresLogin] = useState(false);
+  const [loadVersion, setLoadVersion] = useState(0);
   const [calorieMessage, setCalorieMessage] = useState("");
   const [calculationServings, setCalculationServings] = useState(1);
   const [manualEntry, setManualEntry] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function load() {
+      setLoading(true);
+      setError("");
+      setErrorCode("");
+      setRequiresLogin(false);
+
       try {
-        const response = await fetch(`/api/meal-records/${id}`);
-        const payload = await response.json() as { message?: string; data?: { record?: RecordDetail } };
+        const response = await fetch(`/api/meal-records/${id}`, {
+          signal: controller.signal,
+        });
+        const payload = await response.json() as {
+          message?: string;
+          data?: { record?: RecordDetail };
+          error?: { code?: string };
+        };
         if (!response.ok || !payload.data?.record) {
           setError(payload.message ?? "기록을 불러오지 못했습니다.");
+          setErrorCode(payload.error?.code ?? "");
           return;
         }
         const loadedRecord = payload.data.record;
@@ -66,14 +84,17 @@ export default function RecordDetailPage() {
             ? detectedServings
             : 1,
         );
-      } catch {
-        setError("기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+      } catch (loadError) {
+        if ((loadError as Error).name !== "AbortError") {
+          setError("기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+        }
       } finally {
         setLoading(false);
       }
     }
     void load();
-  }, [id]);
+    return () => controller.abort();
+  }, [id, loadVersion]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -105,6 +126,7 @@ export default function RecordDetailPage() {
 
     setSaving(true);
     setError("");
+    setRequiresLogin(false);
 
     try {
       const response = await fetch(`/api/meal-records/${id}`, {
@@ -117,8 +139,12 @@ export default function RecordDetailPage() {
           recordedTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       });
-      const payload = await response.json() as { message?: string };
+      const payload = await response.json() as {
+        message?: string;
+        error?: { code?: string };
+      };
       if (!response.ok) {
+        setRequiresLogin(payload.error?.code === "UNAUTHORIZED");
         setError(payload.message ?? "기록을 수정하지 못했습니다.");
         return;
       }
@@ -164,16 +190,51 @@ export default function RecordDetailPage() {
     setError("");
   }
 
-  if (loading) return <main className="shell"><p className="status-message">기록을 불러오고 있어요…</p></main>;
+  function retryLoad() {
+    setLoading(true);
+    setError("");
+    setErrorCode("");
+    setLoadVersion((version) => version + 1);
+  }
+
+  if (loading) {
+    return (
+      <main className="shell">
+        <p className="status-message" role="status" aria-live="polite">
+          기록을 불러오고 있어요…
+        </p>
+      </main>
+    );
+  }
 
   if (!record) {
+    const needsLogin = errorCode === "UNAUTHORIZED";
+    const canRetry =
+      errorCode !== "NOT_FOUND" && errorCode !== "VALIDATION_ERROR";
+
     return (
       <main className="shell">
         <Header title="기록 수정" backHref="/today" />
         <section className="empty-state">
           <span aria-hidden="true">!</span>
           <h1>기록을 열 수 없어요</h1>
-          <p>{error || "로그인 상태와 기록 정보를 확인해 주세요."}</p>
+          <p role="alert">{error || "로그인 상태와 기록 정보를 확인해 주세요."}</p>
+          {needsLogin ? (
+            <Link
+              className="primary-button"
+              href={`/login?next=${encodeURIComponent(`/record/${id}`)}`}
+            >
+              로그인하고 계속하기
+            </Link>
+          ) : canRetry ? (
+            <button className="primary-button" type="button" onClick={retryLoad}>
+              다시 시도하기
+            </button>
+          ) : (
+            <Link className="primary-button" href="/today">
+              오늘 기록으로 돌아가기
+            </Link>
+          )}
         </section>
       </main>
     );
@@ -363,6 +424,14 @@ export default function RecordDetailPage() {
         <label>메모 <span className="optional">선택</span><textarea rows={3} maxLength={200} value={record.memo ?? ""} onChange={(event) => setRecord({ ...record, memo: event.target.value || null })} /></label>
         {calorieMessage && <p className="success" role="status">{calorieMessage}</p>}
         {error && <p className="error" role="alert">{error}</p>}
+        {requiresLogin && (
+          <Link
+            className="secondary-button"
+            href={`/login?next=${encodeURIComponent(`/record/${id}`)}`}
+          >
+            로그인하고 계속하기
+          </Link>
+        )}
         <button className="primary-button" type="submit" disabled={saving}>{saving ? "저장 중…" : "수정 내용 저장하기"}</button>
       </form>
     </main>

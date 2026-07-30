@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { AppIcon } from "@/components/AppIcon";
 
@@ -20,17 +21,25 @@ export function CalorieGoalCard({ todayCalories }: { todayCalories: number }) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [loadError, setLoadError] = useState("");
+  const [needsLogin, setNeedsLogin] = useState(false);
   const [message, setMessage] = useState("");
+  const [loadVersion, setLoadVersion] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function loadGoal() {
+      setReady(false);
+      setLoadError("");
+      setNeedsLogin(false);
+
       try {
         const response = await fetch("/api/me", { signal: controller.signal });
         const payload = (await response.json()) as ProfilePayload;
         if (!response.ok) {
-          setError(payload.message || "목표 칼로리를 불러오지 못했습니다.");
+          setNeedsLogin(payload.error?.code === "UNAUTHORIZED");
+          setLoadError(payload.message || "목표 칼로리를 불러오지 못했습니다.");
           return;
         }
 
@@ -40,7 +49,7 @@ export function CalorieGoalCard({ todayCalories }: { todayCalories: number }) {
         setEditing(loadedGoal === null);
       } catch (loadError) {
         if ((loadError as Error).name !== "AbortError") {
-          setError("목표 칼로리를 불러오지 못했습니다.");
+          setLoadError("목표 칼로리를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
         }
       } finally {
         setReady(true);
@@ -49,7 +58,7 @@ export function CalorieGoalCard({ todayCalories }: { todayCalories: number }) {
 
     void loadGoal();
     return () => controller.abort();
-  }, []);
+  }, [loadVersion]);
 
   async function updateGoal(nextGoal: number | null) {
     setSaving(true);
@@ -64,7 +73,12 @@ export function CalorieGoalCard({ todayCalories }: { todayCalories: number }) {
       });
       const payload = (await response.json()) as ProfilePayload;
       if (!response.ok) {
-        setError(payload.message || "목표 칼로리를 저장하지 못했습니다.");
+        if (payload.error?.code === "UNAUTHORIZED") {
+          setNeedsLogin(true);
+          setLoadError(payload.message || "로그인이 필요합니다.");
+        } else {
+          setError(payload.message || "목표 칼로리를 저장하지 못했습니다.");
+        }
         return;
       }
 
@@ -97,11 +111,41 @@ export function CalorieGoalCard({ todayCalories }: { todayCalories: number }) {
     void updateGoal(nextGoal);
   }
 
+  function retryLoad() {
+    setReady(false);
+    setLoadError("");
+    setLoadVersion((version) => version + 1);
+  }
+
   if (!ready) {
     return (
       <section className="summary-card goal-card" aria-busy="true">
         <div className="goal-card-label"><span><AppIcon name="sparkles" size={18} /></span><p>하루 목표 칼로리</p></div>
-        <h1 className="goal-loading">불러오는 중…</h1>
+        <h1 className="goal-loading" role="status" aria-live="polite">불러오는 중…</h1>
+      </section>
+    );
+  }
+
+  if (needsLogin) {
+    return (
+      <section className="summary-card goal-card goal-recovery">
+        <div className="goal-card-label"><span><AppIcon name="sparkles" size={18} /></span><p>하루 목표 칼로리</p></div>
+        <h1 className="goal-editor-title">로그인 후 목표를 설정해요</h1>
+        <small className="goal-help">{loadError || "로그인하면 목표와 섭취량을 함께 관리할 수 있어요."}</small>
+        <Link className="primary-button" href="/login?next=/mypage">로그인하기</Link>
+      </section>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <section className="summary-card goal-card goal-recovery">
+        <div className="goal-card-label"><span><AppIcon name="sparkles" size={18} /></span><p>하루 목표 칼로리</p></div>
+        <h1 className="goal-editor-title">목표를 불러오지 못했어요</h1>
+        <small className="goal-help" role="alert">{loadError}</small>
+        <button className="primary-button" type="button" onClick={retryLoad}>
+          다시 시도하기
+        </button>
       </section>
     );
   }
