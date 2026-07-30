@@ -1,7 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
-import { AppIcon } from "@/components/AppIcon";
 import { PageHero } from "@/components/PageHero";
 
 export default function RecordPage() {
@@ -22,7 +22,7 @@ export default function RecordPage() {
       </ol>
       <section className="choice-grid">
         <Link className="choice-card photo-card" href="/record/photo">
-          <span className="choice-icon"><AppIcon name="camera" size={25} /></span>
+          <span className="choice-icon clay-choice-icon"><Image src="/images/ui/clay-camera.png" alt="" width={62} height={62} priority /></span>
           <span>
             <strong>사진으로 입력</strong>
             <small>사진을 먼저 담고 음식과 양을 직접 확인해요</small>
@@ -30,7 +30,7 @@ export default function RecordPage() {
           <span aria-hidden="true">→</span>
         </Link>
         <Link className="choice-card" href="/record/text">
-          <span className="choice-icon text-icon"><AppIcon name="edit" size={23} /></span>
+          <span className="choice-icon text-icon clay-choice-icon"><Image src="/images/ui/clay-notepad.png" alt="" width={62} height={62} priority /></span>
           <span>
             <strong>직접 입력</strong>
             <small>음식 자료를 검색하고 인분 수로 계산해요</small>

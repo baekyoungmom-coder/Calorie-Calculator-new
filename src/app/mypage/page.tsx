@@ -39,11 +39,19 @@ export default async function MyPage() {
         <div className="profile-actions">
           <Link className="profile-record-link" href="/record"><AppIcon name="plus" size={16} /> 새 기록</Link>
           {user ? (
-            <form action={signOut}>
-              <button className="profile-logout-button" type="submit">
-                로그아웃
-              </button>
-            </form>
+            <>
+              <a className="profile-record-link profile-manage-link" href="#record-data-control">
+                기록 관리
+              </a>
+              <a className="profile-record-link profile-account-link" href="#account-deletion">
+                계정 관리
+              </a>
+              <form action={signOut}>
+                <button className="profile-logout-button" type="submit">
+                  로그아웃
+                </button>
+              </form>
+            </>
           ) : (
             <Link className="profile-login-link" href="/login?next=/mypage">
               로그인
@@ -68,7 +76,7 @@ export default async function MyPage() {
         </div>
       </details>
       <RecordsView mode="all" />
-      {user && <AccountDeletionCard />}
+      {user && <div id="account-deletion"><AccountDeletionCard /></div>}
       <BottomNav />
     </main>
   );

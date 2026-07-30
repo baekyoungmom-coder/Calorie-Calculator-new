@@ -49,6 +49,7 @@ export default function PhotoRecordPage() {
         title="음식 사진을 올려주세요"
         description="사진을 담은 뒤 음식 목록과 드신 인분 수를 직접 확인해요."
         icon="camera"
+        imageSrc="/images/ui/clay-camera.png"
         tone="sky"
         compact
       />
@@ -63,7 +64,7 @@ export default function PhotoRecordPage() {
           </>
         ) : (
           <>
-            <span className="upload-icon"><AppIcon name="camera" size={25} /></span>
+            <span className="upload-icon"><Image src="/images/ui/clay-camera.png" alt="" width={56} height={56} priority /></span>
             <strong>사진을 여기에 담아주세요</strong>
             <span>JPG, PNG, WEBP · 최대 8MB</span>
             <label className="upload-button">

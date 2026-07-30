@@ -1,8 +1,8 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { AppIcon } from "@/components/AppIcon";
 import { FoodSearchField } from "@/components/FoodSearchField";
 import {
   findCalorieFood,
@@ -93,7 +93,12 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
     <form className="form-stack" onSubmit={submit} noValidate>
       <div className="form-card-heading">
         <span aria-hidden="true">
-          <AppIcon name={inputType === "photo" ? "camera" : "edit"} size={23} />
+          <Image
+            src={inputType === "photo" ? "/images/ui/clay-camera.png" : "/images/ui/clay-notepad.png"}
+            alt=""
+            width={48}
+            height={48}
+          />
         </span>
         <div>
           <p>식사 정보</p>

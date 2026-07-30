@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { AppIcon, IconName } from "@/components/AppIcon";
 
 type PageHeroProps = {
@@ -5,6 +6,7 @@ type PageHeroProps = {
   title: string;
   description: string;
   icon: IconName;
+  imageSrc?: string;
   tone?: "mint" | "sky" | "peach" | "lavender";
   compact?: boolean;
 };
@@ -14,6 +16,7 @@ export function PageHero({
   title,
   description,
   icon,
+  imageSrc,
   tone = "mint",
   compact = false,
 }: PageHeroProps) {
@@ -21,7 +24,11 @@ export function PageHero({
     <section className={`page-hero ${tone} ${compact ? "compact" : ""}`}>
       <span className="page-hero-glow" aria-hidden="true" />
       <span className="page-hero-icon" aria-hidden="true">
-        <AppIcon name={icon} size={compact ? 24 : 29} />
+        {imageSrc ? (
+          <Image src={imageSrc} alt="" width={64} height={64} priority />
+        ) : (
+          <AppIcon name={icon} size={compact ? 24 : 29} />
+        )}
       </span>
       <div className="page-hero-copy">
         <p>{eyebrow}</p>

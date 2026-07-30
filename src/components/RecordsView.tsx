@@ -416,7 +416,7 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
       )}
 
       {mode === "all" && records.length > 0 && (
-        <section className="record-data-control" aria-labelledby="record-data-control-title">
+        <section id="record-data-control" className="record-data-control" aria-labelledby="record-data-control-title">
           <div>
             <p>데이터 관리</p>
             <h2 id="record-data-control-title">모든 식사 기록 삭제</h2>
