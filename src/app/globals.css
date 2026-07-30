@@ -2317,6 +2317,110 @@ input, textarea, select {
 }
 .data-guide ul { margin: 0 0 13px; padding-left: 19px; }
 .data-guide a { color: #3e8d82; font-size: 12px; font-weight: 900; }
+.record-data-control {
+  display: grid;
+  gap: 15px;
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid rgb(174 113 107 / 18%);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fffdfb, #f5e9e4);
+  color: #68575a;
+  box-shadow: 6px 8px 13px rgb(111 75 70 / 10%), -4px -4px 10px #fff;
+}
+.record-data-control > div:first-child > p {
+  margin: 0 0 5px;
+  color: #a16b67;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+.record-data-control h2 {
+  margin: 0 0 7px;
+  color: #694c4f;
+  font-size: 18px;
+}
+.record-data-control small {
+  color: #806c6e;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.delete-all-open,
+.delete-all-submit,
+.delete-all-cancel {
+  min-height: 42px;
+  border-radius: 13px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+}
+.delete-all-open {
+  border: 1px solid rgb(165 97 94 / 35%);
+  background: rgb(255 255 255 / 68%);
+  color: #9a5d5b;
+}
+.delete-all-confirm {
+  display: grid;
+  gap: 9px;
+  padding-top: 15px;
+  border-top: 1px solid rgb(174 113 107 / 18%);
+}
+.delete-all-confirm > strong {
+  color: #945853;
+  font-size: 14px;
+}
+.delete-all-confirm label,
+.delete-all-confirm > p {
+  margin: 0;
+  color: #806c6e;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.delete-all-confirm > p { color: #a34f4b; }
+.delete-all-confirm input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid rgb(165 97 94 / 28%);
+  border-radius: 13px;
+  outline: none;
+  background: rgb(255 255 255 / 76%);
+  color: #543f42;
+  font: inherit;
+}
+.delete-all-confirm input:focus {
+  border-color: #b5736d;
+  box-shadow: 0 0 0 3px rgb(181 115 109 / 12%);
+}
+.delete-all-confirm > div {
+  display: grid;
+  grid-template-columns: 1fr 92px;
+  gap: 9px;
+}
+.delete-all-submit {
+  border: 0;
+  background: #a86662;
+  color: #fff;
+}
+.delete-all-submit:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+.delete-all-cancel {
+  border: 1px solid rgb(129 106 108 / 22%);
+  background: rgb(255 255 255 / 62%);
+  color: #746165;
+}
+.data-action-success {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: #ddf2eb;
+  color: #347c70;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
 .auth-privacy-link {
   display: block;
   margin-top: 12px;

@@ -17,6 +17,26 @@ export async function GET() {
   return success({ records: (data ?? []).map(toMealRecord) });
 }
 
+export async function DELETE() {
+  const auth = await getAuthenticatedSupabase();
+  if (!auth) return failure("로그인이 필요합니다.", "UNAUTHORIZED", 401);
+
+  const { data, error } = await auth.supabase
+    .from("meal_records")
+    .delete()
+    .eq("user_id", auth.user.id)
+    .select("id");
+
+  if (error) {
+    return failure("전체 식사 기록을 삭제하지 못했습니다.", "DATABASE_ERROR", 500);
+  }
+
+  return success(
+    { deletedCount: data?.length ?? 0 },
+    "전체 식사 기록을 삭제했습니다.",
+  );
+}
+
 export async function POST(request: NextRequest) {
   const auth = await getAuthenticatedSupabase();
   if (!auth) return failure("기록을 저장하려면 로그인이 필요합니다.", "UNAUTHORIZED", 401);

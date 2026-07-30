@@ -26,7 +26,11 @@ type SavedMealRecord = {
 type ApiResponse = {
   success: boolean;
   message: string;
-  data: { records?: SavedMealRecord[]; totalCalories?: number } | null;
+  data: {
+    records?: SavedMealRecord[];
+    totalCalories?: number;
+    deletedCount?: number;
+  } | null;
   error: { code: string } | null;
 };
 
@@ -77,6 +81,11 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
   const [error, setError] = useState("");
   const [needsLogin, setNeedsLogin] = useState(false);
   const [loadVersion, setLoadVersion] = useState(0);
+  const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+  const [deleteAllPhrase, setDeleteAllPhrase] = useState("");
+  const [deleteAllBusy, setDeleteAllBusy] = useState(false);
+  const [dataActionMessage, setDataActionMessage] = useState("");
+  const [dataActionError, setDataActionError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -173,6 +182,35 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
       setRecords((current) => current.filter((record) => record.id !== id));
     } catch {
       setError("기록을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    }
+  }
+
+  async function removeAll() {
+    if (deleteAllPhrase !== "전체 삭제" || deleteAllBusy) return;
+
+    setDeleteAllBusy(true);
+    setDataActionError("");
+    setDataActionMessage("");
+
+    try {
+      const response = await fetch("/api/meal-records", { method: "DELETE" });
+      const payload = (await response.json()) as ApiResponse;
+      if (!response.ok) {
+        if (payload.error?.code === "UNAUTHORIZED") setNeedsLogin(true);
+        setDataActionError(payload.message || "전체 식사 기록을 삭제하지 못했습니다.");
+        return;
+      }
+
+      const deletedCount = payload.data?.deletedCount ?? records.length;
+      setRecords([]);
+      setRecordRange("week");
+      setDeleteAllOpen(false);
+      setDeleteAllPhrase("");
+      setDataActionMessage(`${deletedCount}개의 식사 기록을 삭제했습니다.`);
+    } catch {
+      setDataActionError("전체 식사 기록을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setDeleteAllBusy(false);
     }
   }
 
@@ -375,6 +413,73 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
             <Link className="primary-button" href="/record">식사 기록하기</Link>
           )}
         </section>
+      )}
+
+      {mode === "all" && records.length > 0 && (
+        <section className="record-data-control" aria-labelledby="record-data-control-title">
+          <div>
+            <p>데이터 관리</p>
+            <h2 id="record-data-control-title">모든 식사 기록 삭제</h2>
+            <small>목표 칼로리와 로그인 계정은 유지되고, 저장된 식사 기록만 모두 삭제돼요.</small>
+          </div>
+
+          {deleteAllOpen ? (
+            <div className="delete-all-confirm">
+              <strong>삭제한 기록은 되돌릴 수 없어요.</strong>
+              <label htmlFor="delete-all-phrase">
+                계속하려면 <b>전체 삭제</b>를 입력해 주세요.
+              </label>
+              <input
+                id="delete-all-phrase"
+                type="text"
+                value={deleteAllPhrase}
+                onChange={(event) => setDeleteAllPhrase(event.target.value)}
+                autoComplete="off"
+                disabled={deleteAllBusy}
+              />
+              {dataActionError && <p role="alert">{dataActionError}</p>}
+              <div>
+                <button
+                  className="delete-all-submit"
+                  type="button"
+                  onClick={removeAll}
+                  disabled={deleteAllPhrase !== "전체 삭제" || deleteAllBusy}
+                >
+                  {deleteAllBusy ? "삭제하는 중…" : "모든 기록 삭제"}
+                </button>
+                <button
+                  className="delete-all-cancel"
+                  type="button"
+                  onClick={() => {
+                    setDeleteAllOpen(false);
+                    setDeleteAllPhrase("");
+                    setDataActionError("");
+                  }}
+                  disabled={deleteAllBusy}
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              className="delete-all-open"
+              type="button"
+              onClick={() => {
+                setDeleteAllOpen(true);
+                setDataActionMessage("");
+              }}
+            >
+              전체 기록 삭제하기
+            </button>
+          )}
+        </section>
+      )}
+
+      {mode === "all" && dataActionMessage && (
+        <p className="data-action-success" role="status" aria-live="polite">
+          {dataActionMessage}
+        </p>
       )}
     </>
   );
