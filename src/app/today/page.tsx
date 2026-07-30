@@ -23,7 +23,9 @@ export default function TodayPage() {
         tone="sky"
         compact
       />
-      <RecordsView mode="today" />
+      <section className="today-workspace" aria-label="오늘 기록 요약과 식사 목록">
+        <RecordsView mode="today" />
+      </section>
       <Link className="floating-add" href="/record" aria-label="새 식사 기록"><AppIcon name="plus" /></Link>
       <BottomNav />
     </main>
