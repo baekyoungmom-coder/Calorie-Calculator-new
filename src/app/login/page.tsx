@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import { AppIcon } from "@/components/AppIcon";
 import { GoogleLoginButton } from "./GoogleLoginButton";
 import { signInWithGoogle } from "./actions";
 
@@ -11,17 +13,29 @@ export default async function LoginPage({
   const safeNext = next?.startsWith("/") && !next.startsWith("//") ? next : "/";
 
   return (
-    <main className="auth-page">
+    <main className="auth-page clay-auth-page">
       <Link className="auth-back" href="/" aria-label="홈으로 돌아가기">
-        ←
+        <AppIcon name="arrow-left" />
       </Link>
-      <div className="food-decoration food-decoration-top" aria-hidden="true">
-        <span>●</span><span>●</span><span>●</span>
-      </div>
+      <section className="auth-visual" aria-hidden="true">
+        <span className="auth-visual-orb" />
+        <Image
+          src="/images/ui/clay-login-profile.png"
+          alt=""
+          width={124}
+          height={124}
+          priority
+        />
+        <p>나의 식사 기록</p>
+      </section>
       <section className="auth-card">
-        <p className="auth-kicker">Calorie Calculator</p>
-        <h1>반가워요!</h1>
-        <p>Google 계정으로 로그인하고 식사 기록을 이어가세요.</p>
+        <p className="auth-kicker">CALORIE CALCULATOR</p>
+        <h1>식사 기록을<br />안전하게 이어가세요</h1>
+        <p>Google 계정으로 로그인하면 목표와 지난 기록을 어느 기기에서나 확인할 수 있어요.</p>
+        <ul className="auth-benefits">
+          <li><AppIcon name="clipboard" size={18} /> 저장한 식사 기록 관리</li>
+          <li><AppIcon name="history" size={18} /> 최근 7일 섭취 흐름 확인</li>
+        </ul>
         {error === "missing-config" && (
           <p className="error">Supabase 환경변수 설정이 필요합니다.</p>
         )}
@@ -47,10 +61,8 @@ export default async function LoginPage({
         <Link className="guest-link" href="/">
           게스트로 계속하기
         </Link>
+        <small className="auth-note">로그인 없이도 칼로리 계산을 3회 체험할 수 있어요.</small>
       </section>
-      <div className="food-decoration food-decoration-bottom" aria-hidden="true">
-        <span>●</span><span>●</span>
-      </div>
     </main>
   );
 }

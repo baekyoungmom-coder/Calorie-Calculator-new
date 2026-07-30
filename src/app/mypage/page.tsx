@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { RecordsView } from "@/components/RecordsView";
 import { createClient } from "@/lib/supabase/server";
 import { AppIcon } from "@/components/AppIcon";
+import { PageHero } from "@/components/PageHero";
 
 export default async function MyPage() {
   const supabase = await createClient();
@@ -17,8 +18,16 @@ export default async function MyPage() {
     "게스트 사용자";
 
   return (
-    <main className="shell">
+    <main className="shell mypage-page">
       <Header title="마이페이지" />
+      <PageHero
+        eyebrow="나의 식사 리포트"
+        title="기록의 흐름을 살펴봐요"
+        description="목표 칼로리와 최근 7일의 식사 기록을 함께 확인할 수 있어요."
+        icon="user"
+        tone="lavender"
+        compact
+      />
       <section className="profile-card">
         <div className="avatar" aria-hidden="true">{name.slice(0, 1).toUpperCase()}</div>
         <div>

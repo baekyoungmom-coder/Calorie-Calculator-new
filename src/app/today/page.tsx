@@ -3,6 +3,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { RecordsView } from "@/components/RecordsView";
 import { AppIcon } from "@/components/AppIcon";
+import { PageHero } from "@/components/PageHero";
 
 export default function TodayPage() {
   const date = new Intl.DateTimeFormat("ko-KR", {
@@ -12,12 +13,16 @@ export default function TodayPage() {
   }).format(new Date());
 
   return (
-    <main className="shell">
+    <main className="shell today-page">
       <Header title="오늘 기록" />
-      <section className="page-intro compact">
-        <p className="eyebrow">{date}</p>
-        <h1>오늘도 잘 기록하고 있어요</h1>
-      </section>
+      <PageHero
+        eyebrow={date}
+        title="오늘의 식사를 모아봐요"
+        description="기록한 식사와 하루 총 섭취 칼로리를 한눈에 확인해요."
+        icon="clipboard"
+        tone="sky"
+        compact
+      />
       <RecordsView mode="today" />
       <Link className="floating-add" href="/record" aria-label="새 식사 기록"><AppIcon name="plus" /></Link>
       <BottomNav />

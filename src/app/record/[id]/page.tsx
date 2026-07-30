@@ -4,6 +4,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { FoodSearchField } from "@/components/FoodSearchField";
 import { Header } from "@/components/Header";
+import { AppIcon } from "@/components/AppIcon";
+import { PageHero } from "@/components/PageHero";
 import {
   estimateMeal,
   findCalorieFood,
@@ -178,13 +180,24 @@ export default function RecordDetailPage() {
   }
 
   return (
-    <main className="shell">
+    <main className="shell record-edit-page">
       <Header title="기록 수정" backHref="/today" />
-      <section className="page-intro compact">
-        <p className="eyebrow">저장된 기록</p>
-        <h1>내용을 수정할 수 있어요</h1>
-      </section>
+      <PageHero
+        eyebrow="저장된 기록"
+        title="내용을 다시 확인해요"
+        description="음식, 양, 칼로리와 시간을 바꾼 뒤 안전하게 저장할 수 있어요."
+        icon="edit"
+        tone="lavender"
+        compact
+      />
       <form className="form-stack" onSubmit={submit}>
+        <div className="form-card-heading">
+          <span aria-hidden="true"><AppIcon name="clipboard" size={23} /></span>
+          <div>
+            <p>기록 수정</p>
+            <strong>바꾸고 싶은 항목만 수정해 주세요</strong>
+          </div>
+        </div>
         <FoodSearchField
           value={record.foodName}
           onChange={(foodName) => {

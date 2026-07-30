@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { AppIcon } from "@/components/AppIcon";
 
 const MIN_DAILY_CALORIE_GOAL = 500;
 const MAX_DAILY_CALORIE_GOAL = 10000;
@@ -99,7 +100,7 @@ export function CalorieGoalCard({ todayCalories }: { todayCalories: number }) {
   if (!ready) {
     return (
       <section className="summary-card goal-card" aria-busy="true">
-        <p>하루 목표 칼로리</p>
+        <div className="goal-card-label"><span><AppIcon name="sparkles" size={18} /></span><p>하루 목표 칼로리</p></div>
         <h1 className="goal-loading">불러오는 중…</h1>
       </section>
     );
@@ -108,7 +109,7 @@ export function CalorieGoalCard({ todayCalories }: { todayCalories: number }) {
   if (editing || goal === null) {
     return (
       <section className="summary-card goal-card">
-        <p>하루 목표 칼로리</p>
+        <div className="goal-card-label"><span><AppIcon name="sparkles" size={18} /></span><p>하루 목표 칼로리</p></div>
         <h1 className="goal-editor-title">
           {goal === null ? "목표를 설정해 주세요" : "목표 수정"}
         </h1>
@@ -158,7 +159,7 @@ export function CalorieGoalCard({ todayCalories }: { todayCalories: number }) {
 
   return (
     <section className="summary-card goal-card">
-      <p>오늘 섭취량 · 하루 목표</p>
+      <div className="goal-card-label"><span><AppIcon name="sparkles" size={18} /></span><p>오늘 섭취량 · 하루 목표</p></div>
       <h1>
         {todayCalories.toLocaleString()}{" "}
         <span>/ {goal.toLocaleString()} kcal</span>

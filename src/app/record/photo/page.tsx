@@ -5,6 +5,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { MealForm } from "@/components/MealForm";
 import { AppIcon } from "@/components/AppIcon";
+import { PageHero } from "@/components/PageHero";
 
 export default function PhotoRecordPage() {
   const [preview, setPreview] = useState("");
@@ -41,13 +42,16 @@ export default function PhotoRecordPage() {
   }
 
   return (
-    <main className="shell">
+    <main className="shell photo-record-page">
       <Header title="사진 입력" backHref="/record" />
-      <section className="page-intro compact">
-        <p className="eyebrow">사진 기록</p>
-        <h1>음식 사진을 올려주세요</h1>
-        <p>사진을 첨부한 뒤 음식 목록과 인분 수를 선택해 주세요.</p>
-      </section>
+      <PageHero
+        eyebrow="사진 기록"
+        title="음식 사진을 올려주세요"
+        description="사진을 담은 뒤 음식 목록과 드신 인분 수를 직접 확인해요."
+        icon="camera"
+        tone="sky"
+        compact
+      />
 
       <section className={`upload-box ${preview ? "has-image" : ""}`}>
         {preview ? (
@@ -60,7 +64,7 @@ export default function PhotoRecordPage() {
         ) : (
           <>
             <span className="upload-icon"><AppIcon name="camera" size={25} /></span>
-            <strong>사진을 선택하세요</strong>
+            <strong>사진을 여기에 담아주세요</strong>
             <span>JPG, PNG, WEBP · 최대 8MB</span>
             <label className="upload-button">
               카메라 또는 갤러리

@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AppIcon } from "@/components/AppIcon";
 import { FoodSearchField } from "@/components/FoodSearchField";
 import {
   findCalorieFood,
@@ -90,6 +91,19 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
 
   return (
     <form className="form-stack" onSubmit={submit} noValidate>
+      <div className="form-card-heading">
+        <span aria-hidden="true">
+          <AppIcon name={inputType === "photo" ? "camera" : "edit"} size={23} />
+        </span>
+        <div>
+          <p>식사 정보</p>
+          <strong>
+            {inputType === "photo"
+              ? "사진 속 음식과 양을 확인해 주세요"
+              : "음식과 드신 양을 입력해 주세요"}
+          </strong>
+        </div>
+      </div>
       <FoodSearchField
         value={foodName}
         onChange={(value) => {

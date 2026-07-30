@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { AppIcon } from "@/components/AppIcon";
 import { CalorieGoalCard } from "@/components/CalorieGoalCard";
 import { MEAL_LABELS, MealType } from "@/lib/meals";
 
@@ -179,10 +180,15 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
   return (
     <>
       {mode === "today" ? (
-        <section className="summary-card">
-          <p>오늘 총 섭취량</p>
-          <h1>{total.toLocaleString()} <span>kcal</span></h1>
-          <small>{records.length}개의 식사 기록</small>
+        <section className="summary-card today-summary">
+          <span className="summary-card-icon" aria-hidden="true">
+            <AppIcon name="sparkles" size={27} />
+          </span>
+          <div>
+            <p>오늘 총 섭취량</p>
+            <h1>{total.toLocaleString()} <span>kcal</span></h1>
+            <small>{records.length}개의 식사 기록</small>
+          </div>
         </section>
       ) : (
         <CalorieGoalCard todayCalories={dailyTotals.at(-1)?.calories ?? 0} />
@@ -192,6 +198,13 @@ export function RecordsView({ mode }: { mode: "today" | "all" }) {
 
       {mode === "all" && (
         <>
+          <div className="insights-heading">
+            <span aria-hidden="true"><AppIcon name="history" size={20} /></span>
+            <div>
+              <p>최근 기록 분석</p>
+              <h2>7일 식사 리포트</h2>
+            </div>
+          </div>
           <section className="weekly-stats" aria-label="최근 7일 섭취 통계">
             <article>
               <span>7일 합계</span>

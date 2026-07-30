@@ -230,8 +230,15 @@ export default function ResultPage() {
   }
 
   return (
-    <main className="shell">
+    <main className="shell result-page">
       <Header title="결과 확인" backHref={draft.inputType === "photo" ? "/record/photo" : "/record/text"} />
+      <section className="result-review-banner">
+        <span aria-hidden="true"><AppIcon name="sparkles" size={25} /></span>
+        <div>
+          <p>계산 완료</p>
+          <strong>저장하기 전에 내용을 확인해 주세요</strong>
+        </div>
+      </section>
       {trialAccess.mode === "guest" && (
         <p className="guest-trial-status" role="status">
           {trialAccess.remaining === 0
@@ -239,7 +246,6 @@ export default function ResultPage() {
             : `게스트 체험 ${trialAccess.used}/${trialAccess.limit} · ${trialAccess.remaining}회 남음`}
         </p>
       )}
-      <p className="result-kicker"><AppIcon name="sparkles" size={17} /> 저장하기 전에 값을 확인해요</p>
       <section className="result-hero">
         <p>
           {draft.calorieSource === "manual"
