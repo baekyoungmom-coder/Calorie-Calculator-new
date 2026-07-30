@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { RecordsView } from "@/components/RecordsView";
@@ -31,7 +32,7 @@ export default async function MyPage() {
         compact
       />
       <section className="profile-card">
-        <div className="avatar" aria-hidden="true">{name.slice(0, 1).toUpperCase()}</div>
+        <div className="avatar" aria-hidden="true"><Image src="/images/ui/clay-login-profile.png" alt="" width={62} height={62} priority /></div>
         <div>
           <strong>{name}</strong>
           <p>{user?.email ?? "로그인하면 기록을 안전하게 저장할 수 있어요."}</p>

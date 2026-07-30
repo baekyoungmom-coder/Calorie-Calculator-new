@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { AppIcon } from "./AppIcon";
 
 export function Header({
@@ -15,7 +16,7 @@ export function Header({
       </Link>
       <strong>{title}</strong>
       <Link className="home-link" href="/today" aria-label="오늘 기록">
-        <AppIcon name="clipboard" size={19} />
+        <Image className="header-clay-icon" src="/images/ui/clay-calendar.png" alt="" width={34} height={34} priority />
       </Link>
     </header>
   );

@@ -2875,3 +2875,98 @@ input, textarea, select {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* 모든 화면에서 상단·하단 조작 아이콘을 같은 귀여운 클레이 버튼으로 보이게 한다. */
+.shell .back-link,
+.shell .home-link {
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #fbffff, #dceff0 58%, #c5e3e6);
+  box-shadow:
+    6px 8px 13px rgb(53 119 124 / 24%),
+    -4px -4px 9px rgb(255 255 255 / 92%),
+    inset 2px 2px 3px rgb(255 255 255 / 76%),
+    inset -2px -3px 4px rgb(55 124 130 / 12%);
+  color: #4d929a;
+}
+
+.shell .back-link:hover,
+.shell .home-link:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  filter: saturate(1.08);
+}
+
+.shell .back-link:active,
+.shell .home-link:active {
+  box-shadow:
+    inset 3px 3px 6px rgb(45 108 114 / 20%),
+    inset -2px -2px 5px rgb(255 255 255 / 78%);
+  transform: translateY(1px) scale(.96);
+}
+
+.header-clay-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(2px 3px 3px rgb(48 104 106 / 22%));
+}
+
+.mypage-page .avatar {
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mypage-page .avatar img {
+  width: 66px;
+  height: 66px;
+  object-fit: contain;
+  filter: drop-shadow(3px 5px 4px rgb(51 101 95 / 25%));
+}
+
+.bottom-nav a {
+  position: relative;
+  align-content: center;
+  gap: 2px;
+}
+
+.bottom-nav a.active::before { display: none; }
+
+.bottom-nav-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 1px;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #fbffff, #e1f2f0);
+  box-shadow:
+    4px 5px 9px rgb(57 118 117 / 17%),
+    -3px -3px 7px rgb(255 255 255 / 90%),
+    inset 1px 1px 2px rgb(255 255 255 / 72%);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.bottom-nav-icon img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(1px 2px 2px rgb(48 103 98 / 18%));
+}
+
+.bottom-nav a.active .bottom-nav-icon {
+  background: linear-gradient(145deg, #dff7f1, #a7dfd2 58%, #82c8bb);
+  box-shadow:
+    inset 2px 2px 4px rgb(57 124 116 / 16%),
+    inset -2px -2px 4px rgb(255 255 255 / 62%),
+    3px 4px 8px rgb(48 115 107 / 16%);
+  transform: translateY(-4px) scale(1.06);
+}
+
+@media (max-width: 560px) {
+  .shell .back-link,
+  .shell .home-link { width: 44px; height: 44px; border-radius: 16px; }
+  .bottom-nav-icon { width: 39px; height: 39px; border-radius: 14px; }
+  .bottom-nav-icon img { width: 35px; height: 35px; }
+}
