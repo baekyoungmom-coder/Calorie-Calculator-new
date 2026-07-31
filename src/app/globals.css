@@ -3065,7 +3065,7 @@ input, textarea, select {
 }
 
 /* 넓은 화면에서는 페이지 전체가 아닌 기록·관리 패널만 필요할 때 스크롤한다. */
-@media (min-width: 1000px) and (min-height: 700px) {
+@media (min-width: 800px) and (min-height: 650px) {
   .shell.text-record-page,
   .shell.photo-record-page,
   .shell.record-choice-page,
@@ -3244,4 +3244,104 @@ input, textarea, select {
   .mypage-workspace > .data-guide { margin: 0; }
   .mypage-workspace > .goal-card { margin: 0; }
   .mypage-workspace > .record-list { margin-top: 0; }
+}
+
+/* 오늘 기록 데스크톱 전용: 요약은 왼쪽, 식사 카드는 오른쪽 2열로 배치한다. */
+@media (min-width: 800px) and (min-height: 650px) {
+  .shell.today-page {
+    position: relative;
+    width: min(1280px, calc(100% - 40px));
+    height: 100dvh;
+    min-height: 650px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 18px 28px 88px;
+    overflow: hidden;
+  }
+
+  .today-page > .topbar {
+    height: 58px;
+    margin: 0;
+    padding: 0 4px;
+  }
+
+  .today-page > .page-hero {
+    min-height: 112px;
+    height: 112px;
+    margin: 12px 0 16px;
+    padding: 20px 90px 20px 24px;
+  }
+
+  .today-page .today-workspace {
+    display: grid;
+    grid-template-columns: minmax(250px, .34fr) minmax(0, 1fr);
+    gap: 22px;
+    min-height: 0;
+    height: calc(100dvh - 228px);
+    padding: 0 4px;
+    overflow: hidden;
+  }
+
+  .today-page .today-summary {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    margin: 0;
+    min-height: 146px;
+    padding: 20px;
+  }
+
+  .today-page .today-list {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0 4px 16px 0;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 14px;
+    scrollbar-gutter: stable;
+  }
+
+  .today-page .today-list > .section-heading {
+    grid-column: 1 / -1;
+    margin: 0 0 2px;
+  }
+
+  .today-page .today-list .record-card {
+    min-height: 128px;
+    margin: 0;
+  }
+
+  .today-page .bottom-nav {
+    position: absolute;
+    top: auto;
+    right: auto;
+    bottom: 18px;
+    left: 28px;
+    width: 250px;
+    min-height: 0;
+    display: flex;
+    gap: 7px;
+    border: 0;
+    border-radius: 20px;
+    box-shadow: none;
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  .today-page .bottom-nav a {
+    flex: 1;
+    min-height: 58px;
+    border-radius: 17px;
+    background: linear-gradient(145deg, #fbffff, #dcefeb);
+    box-shadow: 4px 5px 9px rgb(57 118 117 / 17%), -3px -3px 7px #fff;
+  }
+
+  .today-page .bottom-nav a.active {
+    background: linear-gradient(145deg, #dff7f1, #a7dfd2 58%, #82c8bb);
+  }
 }
