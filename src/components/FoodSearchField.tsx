@@ -34,7 +34,10 @@ export function FoodSearchField({
   const [remoteSuggestions, setRemoteSuggestions] = useState<FoodSuggestion[]>([]);
   const [selectedRemoteFood, setSelectedRemoteFood] = useState<FoodSuggestion | null>(null);
   const suggestionsId = useId();
-  const localSelectedFood = useMemo(() => findCalorieFood(value), [value]);
+  const localSelectedFood = useMemo<FoodSuggestion | null>(() => {
+    const food = findCalorieFood(value);
+    return food ? { ...food, source: "local" } : null;
+  }, [value]);
   const localSuggestions = useMemo<FoodSuggestion[]>(
     () => searchCalorieFoods(value).map((food) => ({ ...food, source: "local" })),
     [value],
@@ -159,7 +162,9 @@ export function FoodSearchField({
       {selectedFood && (
         <p className="food-match" role="status">
           <span>선택됨</span>
-          {selectedFood.name} · 1인분{" "}
+          {selectedFood.name} · {selectedFood.source === "public" && selectedFood.basisAmount && selectedFood.basisUnit
+            ? `${selectedFood.basisAmount.toLocaleString()}${selectedFood.basisUnit}`
+            : "1인분"}{" "}
           {Math.round(selectedFood.calories).toLocaleString()} kcal
         </p>
       )}
