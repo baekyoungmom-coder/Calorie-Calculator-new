@@ -17,10 +17,9 @@ import {
 type MealFormProps = {
   inputType: "text" | "photo";
   imageName?: string;
-  imageDataUrl?: string;
 };
 
-export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) {
+export function MealForm({ inputType, imageName }: MealFormProps) {
   const router = useRouter();
   const [foodName, setFoodName] = useState("");
   const [servings, setServings] = useState(1);
@@ -38,45 +37,10 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
   });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [analysisNote, setAnalysisNote] = useState("");
-  const [analysisError, setAnalysisError] = useState("");
   const selectedFood = useMemo(() => findCalorieFood(foodName), [foodName]);
   const suggestions = useMemo(() => searchCalorieFoods(foodName), [foodName]);
   const isPublicFood = (publicFood?.displayName ?? publicFood?.name) === foodName;
   const isManualMode = manualEntry && !selectedFood && !isPublicFood;
-
-  async function analyzePhoto() {
-    if (!imageDataUrl || analyzing) return;
-    setAnalyzing(true);
-    setAnalysisError("");
-    setAnalysisNote("");
-    try {
-      const response = await fetch("/api/photo-estimate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageDataUrl }),
-      });
-      const payload = (await response.json()) as {
-        success?: boolean;
-        message?: string;
-        data?: { items?: Array<{ name: string; matchedFoodName: string | null; calories: number | null }>; note?: string };
-      };
-      if (!response.ok || !payload.success) {
-        throw new Error(payload.message || "사진 분석에 실패했습니다.");
-      }
-      const items = payload.data?.items || [];
-      setAnalysisNote(payload.data?.note || "");
-      if (items[0]) {
-        setFoodName(items[0].matchedFoodName || items[0].name);
-        setError("");
-      }
-    } catch (error) {
-      setAnalysisError(error instanceof Error ? error.message : "사진 분석에 실패했습니다.");
-    } finally {
-      setAnalyzing(false);
-    }
-  }
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -170,6 +134,11 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
           </strong>
         </div>
       </div>
+      {inputType === "photo" && (
+        <p className="flow-note">
+          사진을 참고해 음식 이름을 입력하면 공공 영양 DB에서 기준 칼로리와 단위를 찾아 계산해요.
+        </p>
+      )}
       <FoodSearchField
         value={foodName}
         onChange={(value) => {
@@ -193,16 +162,6 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
         noResultsMessage="칼로리 자료에서 일치하는 음식을 찾지 못했어요."
         usePublicDb
       />
-      {inputType === "photo" && imageDataUrl && (
-        <section className="photo-analysis-box" aria-label="사진 음식 분석">
-          <button className="secondary-button" type="button" onClick={analyzePhoto} disabled={analyzing}>
-            {analyzing ? "사진에서 음식 찾는 중…" : "사진에서 음식 후보 찾기"}
-          </button>
-          <small>무료 인식 모델의 결과는 추정 후보이며, 저장 전에 음식과 양을 확인해 주세요.</small>
-          {analysisNote && <p className="success" role="status">{analysisNote}</p>}
-          {analysisError && <p className="error" role="alert">{analysisError}</p>}
-        </section>
-      )}
       {foodName.trim() &&
         !selectedFood &&
         !isPublicFood &&
