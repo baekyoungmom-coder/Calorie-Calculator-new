@@ -127,6 +127,29 @@ button.primary-button { justify-content: center; }
   color: var(--ink);
 }
 
+.photo-analysis-box {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #eefcf8, #d9f1ec);
+  box-shadow: inset 1px 1px 3px rgb(255 255 255 / 72%), 3px 4px 8px rgb(57 118 117 / 10%);
+}
+
+.photo-analysis-box .secondary-button {
+  justify-self: start;
+}
+
+.photo-analysis-box small {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.photo-analysis-box .success,
+.photo-analysis-box .error {
+  margin-top: 2px;
+}
+
 .quick-nav {
   display: flex;
   justify-content: center;

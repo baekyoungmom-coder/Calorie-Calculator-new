@@ -9,6 +9,7 @@ import { PageHero } from "@/components/PageHero";
 
 export default function PhotoRecordPage() {
   const [preview, setPreview] = useState("");
+  const [analysisImage, setAnalysisImage] = useState("");
   const [imageName, setImageName] = useState("");
   const [error, setError] = useState("");
 
@@ -18,7 +19,7 @@ export default function PhotoRecordPage() {
     };
   }, [preview]);
 
-  function chooseImage(event: ChangeEvent<HTMLInputElement>) {
+  async function chooseImage(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -31,13 +32,28 @@ export default function PhotoRecordPage() {
     }
     if (preview) URL.revokeObjectURL(preview);
     setPreview(URL.createObjectURL(file));
-    setImageName(file.name);
+    setAnalysisImage("");
     setError("");
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, 1100 / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      bitmap.close();
+      setAnalysisImage(canvas.toDataURL("image/jpeg", 0.72));
+    } catch {
+      setAnalysisImage("");
+      setError("사진을 준비하지 못했습니다. 다른 이미지로 다시 시도해 주세요.");
+    }
+    setImageName(file.name);
   }
 
   function clearImage() {
     if (preview) URL.revokeObjectURL(preview);
     setPreview("");
+    setAnalysisImage("");
     setImageName("");
   }
 
@@ -79,7 +95,7 @@ export default function PhotoRecordPage() {
       )}
       {error && <p className="error" role="alert">{error}</p>}
       {preview ? (
-        <MealForm inputType="photo" imageName={imageName} />
+        <MealForm inputType="photo" imageName={imageName} imageDataUrl={analysisImage} />
       ) : (
         <button className="primary-button" disabled>
           사진을 먼저 선택해 주세요
