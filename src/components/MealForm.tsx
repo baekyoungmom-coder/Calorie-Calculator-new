@@ -3,7 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FoodSearchField } from "@/components/FoodSearchField";
+import { FoodSearchField, type FoodSuggestion } from "@/components/FoodSearchField";
 import {
   findCalorieFood,
   MealDraft,
@@ -27,6 +27,8 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
   const [manualEntry, setManualEntry] = useState(false);
   const [manualAmount, setManualAmount] = useState("");
   const [manualCalories, setManualCalories] = useState("");
+  const [publicFood, setPublicFood] = useState<FoodSuggestion | null>(null);
+  const [publicAmount, setPublicAmount] = useState("");
   const [mealType, setMealType] = useState<MealType>("breakfast");
   const [memo, setMemo] = useState("");
   const [recordedAt, setRecordedAt] = useState(() => {
@@ -41,7 +43,8 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
   const [analysisError, setAnalysisError] = useState("");
   const selectedFood = useMemo(() => findCalorieFood(foodName), [foodName]);
   const suggestions = useMemo(() => searchCalorieFoods(foodName), [foodName]);
-  const isManualMode = manualEntry && !selectedFood;
+  const isPublicFood = publicFood?.name === foodName;
+  const isManualMode = manualEntry && !selectedFood && !isPublicFood;
 
   async function analyzePhoto() {
     if (!imageDataUrl || analyzing) return;
@@ -81,7 +84,7 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
       setError("음식 이름을 입력해 주세요.");
       return;
     }
-    if (!selectedFood && !isManualMode) {
+    if (!selectedFood && !isManualMode && !isPublicFood) {
       setError("정확한 계산을 위해 검색 결과에서 음식을 선택해 주세요.");
       return;
     }
@@ -101,14 +104,29 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
       return;
     }
 
+    const enteredPublicAmount = Number(publicAmount);
+    if (
+      isPublicFood &&
+      (!Number.isFinite(enteredPublicAmount) || enteredPublicAmount <= 0 || enteredPublicAmount > 10000)
+    ) {
+      setError("섭취량을 0보다 큰 값으로 입력해 주세요.");
+      return;
+    }
+
+    const publicCalories = isPublicFood && publicFood?.basisAmount
+      ? Math.round((publicFood.calories * enteredPublicAmount) / publicFood.basisAmount)
+      : null;
+
     setSubmitting(true);
     const draft: MealDraft = {
       trialId: createTrialId(),
       inputType,
-      foodName: selectedFood?.name ?? foodName.trim(),
+      foodName: isPublicFood ? publicFood.name : (selectedFood?.name ?? foodName.trim()),
       amount: isManualMode
         ? manualAmount.trim()
-        : `${servings.toLocaleString("ko-KR")}인분`,
+        : isPublicFood
+          ? `${enteredPublicAmount.toLocaleString("ko-KR")}${publicFood.basisUnit}`
+          : `${servings.toLocaleString("ko-KR")}인분`,
       mealType,
       memo: memo.trim(),
       recordedAt: new Date(recordedAt).toISOString(),
@@ -120,6 +138,11 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
       draft.confidence = "low";
       draft.reason =
         "칼로리 자료에 없는 음식으로 사용자가 직접 확인해 입력한 값입니다.";
+    }
+    if (isPublicFood && publicFood && publicCalories !== null) {
+      draft.estimatedCalories = publicCalories;
+      draft.confidence = "medium";
+      draft.reason = `${publicFood.sourceLabel ?? "공공 영양 DB"}의 ${publicFood.basisAmount}${publicFood.basisUnit} 기준 ${publicFood.calories.toLocaleString("ko-KR")} kcal 값을 바탕으로 ${enteredPublicAmount.toLocaleString("ko-KR")}${publicFood.basisUnit} 섭취량을 계산한 추정치예요.`;
     }
     setDraft(draft);
     router.push("/result");
@@ -149,15 +172,24 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
         value={foodName}
         onChange={(value) => {
           setFoodName(value);
+          setPublicFood(null);
           setError("");
         }}
-        onSelect={() => {
+        onSelect={(food) => {
+          if (food.source === "public" && food.basisAmount && food.basisUnit) {
+            setPublicFood(food);
+            setPublicAmount(String(food.basisAmount));
+          } else {
+            setPublicFood(null);
+            setPublicAmount("");
+          }
           setManualEntry(false);
           setManualAmount("");
           setManualCalories("");
           setError("");
         }}
         noResultsMessage="칼로리 자료에서 일치하는 음식을 찾지 못했어요."
+        usePublicDb
       />
       {inputType === "photo" && imageDataUrl && (
         <section className="photo-analysis-box" aria-label="사진 음식 분석">
@@ -171,6 +203,7 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
       )}
       {foodName.trim() &&
         !selectedFood &&
+        !isPublicFood &&
         suggestions.length === 0 &&
         !manualEntry && (
           <button
@@ -230,6 +263,26 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
             </small>
           </label>
         </>
+      ) : isPublicFood && publicFood ? (
+        <label>
+          섭취량
+          <span className="calorie-input-wrap">
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0.1"
+              max="10000"
+              step="0.1"
+              value={publicAmount}
+              onChange={(event) => setPublicAmount(event.target.value)}
+              required
+            />
+            <small>{publicFood.basisUnit}</small>
+          </span>
+          <small className="field-help">
+            공공 영양 DB의 {publicFood.basisAmount}{publicFood.basisUnit} 기준 {Math.round(publicFood.calories).toLocaleString("ko-KR")} kcal 값을 사용해 계산해요.
+          </small>
+        </label>
       ) : (
         <label>
           섭취량

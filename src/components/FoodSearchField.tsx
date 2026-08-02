@@ -1,17 +1,26 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import {
   findCalorieFood,
   searchCalorieFoods,
 } from "@/lib/meals";
 import type { CalorieFood } from "@/lib/meals";
 
+export type FoodSuggestion = CalorieFood & {
+  source: "local" | "public";
+  basisAmount?: number;
+  basisUnit?: "g" | "ml";
+  sourceLabel?: string;
+  foodCode?: string;
+};
+
 type FoodSearchFieldProps = {
   value: string;
   onChange: (value: string) => void;
-  onSelect?: (food: CalorieFood) => void;
+  onSelect?: (food: FoodSuggestion) => void;
   noResultsMessage?: string;
+  usePublicDb?: boolean;
 };
 
 export function FoodSearchField({
@@ -19,11 +28,74 @@ export function FoodSearchField({
   onChange,
   onSelect,
   noResultsMessage = "일치하는 음식이 없어요. 다른 이름으로 검색해 주세요.",
+  usePublicDb = false,
 }: FoodSearchFieldProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [remoteSuggestions, setRemoteSuggestions] = useState<FoodSuggestion[]>([]);
+  const [selectedRemoteFood, setSelectedRemoteFood] = useState<FoodSuggestion | null>(null);
   const suggestionsId = useId();
-  const selectedFood = useMemo(() => findCalorieFood(value), [value]);
-  const suggestions = useMemo(() => searchCalorieFoods(value), [value]);
+  const localSelectedFood = useMemo(() => findCalorieFood(value), [value]);
+  const localSuggestions = useMemo<FoodSuggestion[]>(
+    () => searchCalorieFoods(value).map((food) => ({ ...food, source: "local" })),
+    [value],
+  );
+  const selectedFood =
+    selectedRemoteFood?.name === value ? selectedRemoteFood : localSelectedFood;
+  const suggestions = remoteSuggestions.length > 0 ? remoteSuggestions : localSuggestions;
+
+  useEffect(() => {
+    if (!usePublicDb || value.trim().length < 2) {
+      setRemoteSuggestions([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const query = value.trim();
+
+    async function searchPublicFoods() {
+      try {
+        const response = await fetch(`/api/food-search?q=${encodeURIComponent(query)}`, {
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as {
+          success?: boolean;
+          data?: {
+            source?: string;
+            items?: Array<{
+              name: string;
+              calories: number;
+              basisAmount?: number;
+              basisUnit?: "g" | "ml";
+              source?: string;
+              foodCode?: string;
+            }>;
+          };
+        };
+        if (!response.ok || !payload.success || payload.data?.source !== "food_nutrition_master") {
+          setRemoteSuggestions([]);
+          return;
+        }
+        setRemoteSuggestions(
+          (payload.data.items ?? []).map((food) => ({
+            name: food.name,
+            calories: food.calories,
+            count: 1,
+            normalizedName: food.name.normalize("NFKC").toLowerCase(),
+            source: "public" as const,
+            basisAmount: food.basisAmount,
+            basisUnit: food.basisUnit,
+            sourceLabel: food.source,
+            foodCode: food.foodCode,
+          })),
+        );
+      } catch {
+        if (!controller.signal.aborted) setRemoteSuggestions([]);
+      }
+    }
+
+    void searchPublicFoods();
+    return () => controller.abort();
+  }, [usePublicDb, value]);
 
   return (
     <div className="food-search-field">
@@ -56,7 +128,7 @@ export function FoodSearchField({
           >
             {suggestions.map((food) => (
               <button
-                key={food.normalizedName}
+                key={food.foodCode ?? `${food.source}-${food.normalizedName}`}
                 type="button"
                 role="option"
                 aria-selected={
@@ -65,13 +137,16 @@ export function FoodSearchField({
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => {
                   onChange(food.name);
+                  setSelectedRemoteFood(food.source === "public" ? food : null);
                   onSelect?.(food);
                   setShowSuggestions(false);
                 }}
               >
                 <span>{food.name}</span>
                 <small>
-                  1인분 {Math.round(food.calories).toLocaleString()} kcal
+                  {food.source === "public" && food.basisAmount && food.basisUnit
+                    ? `${food.basisAmount.toLocaleString()}${food.basisUnit} ${Math.round(food.calories).toLocaleString()} kcal`
+                    : `1인분 ${Math.round(food.calories).toLocaleString()} kcal`}
                 </small>
               </button>
             ))}
