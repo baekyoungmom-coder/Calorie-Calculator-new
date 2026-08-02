@@ -9,11 +9,18 @@ import type { CalorieFood } from "@/lib/meals";
 
 export type FoodSuggestion = CalorieFood & {
   source: "local" | "public";
+  /** The concise name shown in the UI; the original `name` stays unchanged. */
+  displayName?: string;
   basisAmount?: number;
   basisUnit?: "g" | "ml";
   sourceLabel?: string;
   foodCode?: string;
 };
+
+/** Keep product-line markers out of the primary UI label without changing DB data. */
+export function getFoodDisplayName(name: string) {
+  return name.replace(/^\s*x\.?\s*o\.?\s*/i, "").trim() || name;
+}
 
 type FoodSearchFieldProps = {
   value: string;
@@ -43,7 +50,9 @@ export function FoodSearchField({
     [value],
   );
   const selectedFood =
-    selectedRemoteFood?.name === value ? selectedRemoteFood : localSelectedFood;
+    (selectedRemoteFood?.displayName ?? selectedRemoteFood?.name) === value
+      ? selectedRemoteFood
+      : localSelectedFood;
   const suggestions = remoteSuggestions.length > 0 ? remoteSuggestions : localSuggestions;
 
   useEffect(() => {
@@ -81,6 +90,7 @@ export function FoodSearchField({
         setRemoteSuggestions(
           (payload.data.items ?? []).map((food) => ({
             name: food.name,
+            displayName: getFoodDisplayName(food.name),
             calories: food.calories,
             count: 1,
             normalizedName: food.name.normalize("NFKC").toLowerCase(),
@@ -139,13 +149,13 @@ export function FoodSearchField({
                 }
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => {
-                  onChange(food.name);
+                  onChange(food.displayName ?? food.name);
                   setSelectedRemoteFood(food.source === "public" ? food : null);
                   onSelect?.(food);
                   setShowSuggestions(false);
                 }}
               >
-                <span>{food.name}</span>
+                <span>{food.displayName ?? food.name}</span>
                 <small>
                   {food.source === "public" && food.basisAmount && food.basisUnit
                     ? `${food.basisAmount.toLocaleString()}${food.basisUnit} ${Math.round(food.calories).toLocaleString()} kcal`
@@ -162,7 +172,7 @@ export function FoodSearchField({
       {selectedFood && (
         <p className="food-match" role="status">
           <span>선택됨</span>
-          {selectedFood.name} · {selectedFood.source === "public" && selectedFood.basisAmount && selectedFood.basisUnit
+          {selectedFood.displayName ?? selectedFood.name} · {selectedFood.source === "public" && selectedFood.basisAmount && selectedFood.basisUnit
             ? `${selectedFood.basisAmount.toLocaleString()}${selectedFood.basisUnit}`
             : "1인분"}{" "}
           {Math.round(selectedFood.calories).toLocaleString()} kcal

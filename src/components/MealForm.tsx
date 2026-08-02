@@ -43,7 +43,7 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
   const [analysisError, setAnalysisError] = useState("");
   const selectedFood = useMemo(() => findCalorieFood(foodName), [foodName]);
   const suggestions = useMemo(() => searchCalorieFoods(foodName), [foodName]);
-  const isPublicFood = publicFood?.name === foodName;
+  const isPublicFood = (publicFood?.displayName ?? publicFood?.name) === foodName;
   const isManualMode = manualEntry && !selectedFood && !isPublicFood;
 
   async function analyzePhoto() {
@@ -121,11 +121,13 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
     const draft: MealDraft = {
       trialId: createTrialId(),
       inputType,
-      foodName: isPublicFood ? publicFood.name : (selectedFood?.name ?? foodName.trim()),
+      foodName: isPublicFood
+        ? (publicFood?.displayName ?? publicFood?.name ?? foodName.trim())
+        : (selectedFood?.name ?? foodName.trim()),
       amount: isManualMode
         ? manualAmount.trim()
         : isPublicFood
-          ? `${enteredPublicAmount.toLocaleString("ko-KR")}${publicFood.basisUnit}`
+          ? `${enteredPublicAmount.toLocaleString("ko-KR")}${publicFood?.basisUnit ?? "g"}`
           : `${servings.toLocaleString("ko-KR")}인분`,
       mealType,
       memo: memo.trim(),
