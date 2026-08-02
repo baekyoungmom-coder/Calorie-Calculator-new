@@ -122,7 +122,7 @@ export function MealForm({ inputType, imageName, imageDataUrl }: MealFormProps) 
       trialId: createTrialId(),
       inputType,
       foodName: isPublicFood
-        ? (publicFood?.displayName ?? publicFood?.name ?? foodName.trim())
+        ? (publicFood?.name ?? foodName.trim())
         : (selectedFood?.name ?? foodName.trim()),
       amount: isManualMode
         ? manualAmount.trim()

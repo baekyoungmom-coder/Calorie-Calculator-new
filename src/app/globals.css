@@ -256,6 +256,17 @@ select {
 .food-suggestions button:last-child { border-bottom: 0; }
 .food-suggestions button:hover, .food-suggestions button:focus { background: var(--green-pale); }
 .food-suggestions small { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.food-suggestion-name { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.food-product-label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: 99px;
+  background: #edf5f1;
+  color: var(--green-dark) !important;
+  font-size: 10px !important;
+  font-weight: 700;
+}
 .food-match {
   display: flex;
   align-items: center;
@@ -265,7 +276,7 @@ select {
   font-size: 12px;
   font-weight: 700;
 }
-.food-match span {
+.food-match-status {
   padding: 3px 7px;
   border-radius: 99px;
   background: var(--green-pale);

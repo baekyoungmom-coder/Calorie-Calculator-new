@@ -11,15 +11,19 @@ export type FoodSuggestion = CalorieFood & {
   source: "local" | "public";
   /** The concise name shown in the UI; the original `name` stays unchanged. */
   displayName?: string;
+  productLabel?: string;
   basisAmount?: number;
   basisUnit?: "g" | "ml";
   sourceLabel?: string;
   foodCode?: string;
 };
 
-/** Keep product-line markers out of the primary UI label without changing DB data. */
-export function getFoodDisplayName(name: string) {
-  return name.replace(/^\s*x\.?\s*o\.?\s*/i, "").trim() || name;
+/** Separate an X.O. product marker from the food name without changing DB data. */
+export function getFoodNameParts(name: string) {
+  const match = name.match(/^\s*(x\.?\s*o\.?)\s+(.+)$/i);
+  return match
+    ? { displayName: match[2].trim(), productLabel: match[1].replace(/\s/g, "") }
+    : { displayName: name, productLabel: undefined };
 }
 
 type FoodSearchFieldProps = {
@@ -88,9 +92,12 @@ export function FoodSearchField({
           return;
         }
         setRemoteSuggestions(
-          (payload.data.items ?? []).map((food) => ({
+          (payload.data.items ?? []).map((food) => {
+            const { displayName, productLabel } = getFoodNameParts(food.name);
+            return {
             name: food.name,
-            displayName: getFoodDisplayName(food.name),
+            displayName,
+            productLabel,
             calories: food.calories,
             count: 1,
             normalizedName: food.name.normalize("NFKC").toLowerCase(),
@@ -99,7 +106,8 @@ export function FoodSearchField({
             basisUnit: food.basisUnit,
             sourceLabel: food.source,
             foodCode: food.foodCode,
-          })),
+            };
+          }),
         );
       } catch {
         if (!controller.signal.aborted) setRemoteSuggestions([]);
@@ -155,7 +163,10 @@ export function FoodSearchField({
                   setShowSuggestions(false);
                 }}
               >
-                <span>{food.displayName ?? food.name}</span>
+                <span className="food-suggestion-name">
+                  {food.displayName ?? food.name}
+                  {food.productLabel && <small className="food-product-label">{food.productLabel}</small>}
+                </span>
                 <small>
                   {food.source === "public" && food.basisAmount && food.basisUnit
                     ? `${food.basisAmount.toLocaleString()}${food.basisUnit} ${Math.round(food.calories).toLocaleString()} kcal`
@@ -171,8 +182,10 @@ export function FoodSearchField({
       )}
       {selectedFood && (
         <p className="food-match" role="status">
-          <span>선택됨</span>
-          {selectedFood.displayName ?? selectedFood.name} · {selectedFood.source === "public" && selectedFood.basisAmount && selectedFood.basisUnit
+          <span className="food-match-status">선택됨</span>
+          <strong>{selectedFood.displayName ?? selectedFood.name}</strong>
+          {selectedFood.productLabel && <small className="food-product-label">{selectedFood.productLabel}</small>}
+          · {selectedFood.source === "public" && selectedFood.basisAmount && selectedFood.basisUnit
             ? `${selectedFood.basisAmount.toLocaleString()}${selectedFood.basisUnit}`
             : "1인분"}{" "}
           {Math.round(selectedFood.calories).toLocaleString()} kcal
