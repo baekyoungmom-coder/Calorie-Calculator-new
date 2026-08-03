@@ -5,6 +5,7 @@ export type RawCalorieFood = {
   basisGrams?: number;
   source?: string;
   sourceCode?: string;
+  sourceRecordKey?: string;
   sourceUpdatedAt?: string | null;
 };
 

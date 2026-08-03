@@ -8,6 +8,7 @@ const sourcePath = resolve(
   "source",
   "official-raw-foods.csv",
 );
+const dryRun = process.argv.includes("--dry-run");
 const source = new TextDecoder("euc-kr")
   .decode(readFileSync(sourcePath))
   .replace(/^\uFEFF/, "");
@@ -81,6 +82,7 @@ const foods = lines.flatMap((line) => {
     source_food_code: sourceFoodCode,
     name,
     normalized_name: normalizeFoodName(name),
+    source_record_key: `${sourceFoodCode}:${normalizeFoodName(name)}`,
     food_type: "raw",
     energy_kcal: energyKcal,
     basis_grams: basisGrams,
@@ -89,6 +91,37 @@ const foods = lines.flatMap((line) => {
     synced_at: new Date().toISOString(),
   }];
 });
+
+const duplicateSourceCodes = foods.length - new Set(
+  foods.map((food) => food.source_food_code),
+).size;
+const duplicateRecordKeys = foods.length - new Set(
+  foods.map((food) => food.source_record_key),
+).size;
+if (duplicateRecordKeys > 0) {
+  throw new Error(`중복된 공식 식품 레코드 키 ${duplicateRecordKeys}건을 발견했습니다.`);
+}
+
+if (dryRun) {
+  const basisValues = new Set(foods.map((food) => food.basis_grams));
+  const sourceNames = new Set(foods.map((food) => food.source_name));
+  console.log(
+    JSON.stringify(
+      {
+        validFoods: foods.length,
+        skippedRows: lines.filter((line) => line.trim()).length - foods.length,
+        duplicateSourceCodes,
+        duplicateRecordKeys,
+        basisGrams: [...basisValues].sort((left, right) => left - right),
+        sourceCount: sourceNames.size,
+        status: "validated_without_database_write",
+      },
+      null,
+      2,
+    ),
+  );
+  process.exit(0);
+}
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const secretKey = process.env.SUPABASE_SECRET_KEY;
@@ -100,7 +133,7 @@ const supabase = createClient(url, secretKey, { auth: { persistSession: false } 
 for (let index = 0; index < foods.length; index += 500) {
   const { error } = await supabase
     .from("foods")
-    .upsert(foods.slice(index, index + 500), { onConflict: "source_food_code" });
+    .upsert(foods.slice(index, index + 500), { onConflict: "source_record_key" });
   if (error) throw new Error(`foods 동기화에 실패했습니다: ${error.message}`);
 }
 

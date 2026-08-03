@@ -128,12 +128,13 @@ const officialCatalog = officialDataLines
     }
 
     return [{
-      id: `official:${id}`,
+      id: `official:${id}:${normalizeFoodName(sourceName)}`,
       name: sourceName.replace(/_/g, " ").replace(/\s+/g, " ").trim(),
       calories,
       basisGrams,
       source: values[officialIndexes["출처명"]]?.trim() || "공식 식품영양성분 DB",
       sourceCode: id,
+      sourceRecordKey: `${id}:${normalizeFoodName(sourceName)}`,
       sourceUpdatedAt: values[officialIndexes["데이터기준일자"]]?.trim() || null,
     }];
   });

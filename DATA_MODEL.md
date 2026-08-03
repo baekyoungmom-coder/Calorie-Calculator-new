@@ -20,7 +20,8 @@ Calorie Calculator 앱에서 저장해야 하는 데이터 구조를 정의한�
 
 필드 예시:
 - source_name
-- source_food_code : 공식 원본 식품코드, 중복 불가
+- source_food_code : 공식 원본 식품코드
+- source_record_key : 식품코드와 정규화된 식품명을 결합한 동기화용 고유 키
 - name
 - normalized_name
 - food_type : raw / processed / dish

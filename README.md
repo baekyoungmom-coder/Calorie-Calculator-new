@@ -20,7 +20,7 @@ npm run dev
 
 운영 환경에서는 `supabase/migrations/20260803110000_add_food_reference_data.sql`의 `foods` 테이블에 공식 데이터를 서버 전용 동기화 작업으로 적재합니다. 사용자 검색 시 외부 API를 직접 호출하지 않습니다.
 
-Supabase SQL Editor 또는 CLI로 마이그레이션을 적용한 뒤, 로컬 개발 환경에서는 `npm run sync:foods`를 실행해 원재료성 식품을 적재합니다. 이 명령은 `.env.local`의 서버 전용 키를 사용하며, 키를 출력하거나 커밋하지 않습니다.
+먼저 `npm run sync:foods:dry-run`으로 변환 건수·식품코드 중복·g 기준량을 DB에 쓰지 않고 검증합니다. Supabase SQL Editor 또는 CLI로 마이그레이션을 적용한 뒤, `npm run sync:foods`, `npm run verify:foods` 순으로 실행해 원재료성 식품을 적재하고 DB의 건수·식품코드·기준량·에너지 표본을 대조합니다. 동기화와 검증 명령은 `.env.local`의 서버 전용 키를 사용하며, 키를 출력하거나 커밋하지 않습니다.
 
 ## 다른 컴퓨터에서 이어서 작업하기
 
