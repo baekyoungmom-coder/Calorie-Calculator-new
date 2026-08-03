@@ -1,6 +1,5 @@
 "use client";
 
-import { createBrowserClient } from "@supabase/ssr";
 import { useState } from "react";
 
 export function GoogleLoginButton({ next }: { next: string }) {
@@ -8,30 +7,24 @@ export function GoogleLoginButton({ next }: { next: string }) {
   const [error, setError] = useState("");
 
   async function signIn() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-    if (!url || !key) {
-      setError("Supabase 설정을 확인해 주세요.");
-      return;
-    }
-
     setPending(true);
     setError("");
-    const supabase = createBrowserClient(url, key);
-    const { data, error: signInError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
+    const response = await fetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ callbackOrigin: window.location.origin, next }),
     });
+    const payload = (await response.json()) as {
+      data?: { url?: string };
+    };
 
-    if (signInError || !data.url) {
+    if (!response.ok || !payload.data?.url) {
       setError("Google 로그인을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.");
       setPending(false);
       return;
     }
 
-    window.location.assign(data.url);
+    window.location.assign(payload.data.url);
   }
 
   return (
