@@ -36,4 +36,4 @@ Google OAuth returns to the browser's current app origin. In Supabase Auth,
 allow both the production callback URL and this Vercel project's Preview
 callback URLs, for example:
 
-`https://calorie-calculator-new-*.vercel.app/auth/callback`
+`https://calorie-calculator-*.vercel.app/auth/callback`

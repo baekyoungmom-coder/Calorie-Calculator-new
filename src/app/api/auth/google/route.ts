@@ -9,8 +9,10 @@ function isAllowedOrigin(value: unknown) {
   try {
     const url = new URL(value);
     const isProduction = url.hostname === "calorie-calculator-new.vercel.app";
+    // Vercel's immutable Preview URLs use the project name without the
+    // repository's "-new" suffix (for example, calorie-calculator-<id>).
     const isPreview =
-      url.hostname.startsWith("calorie-calculator-new-") &&
+      url.hostname.startsWith("calorie-calculator-") &&
       url.hostname.endsWith(".vercel.app");
     const isLocal =
       process.env.NODE_ENV !== "production" &&
