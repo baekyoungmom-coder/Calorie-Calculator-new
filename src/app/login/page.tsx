@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { AppIcon } from "@/components/AppIcon";
 import { GoogleLoginButton } from "./GoogleLoginButton";
-import { signInWithGoogle } from "./actions";
 
 export default async function LoginPage({
   searchParams,
@@ -57,10 +56,7 @@ export default async function LoginPage({
         {error === "oauth-callback" && (
           <p className="error">로그인 콜백에 인증 코드가 없습니다. 리다이렉트 설정을 확인해 주세요.</p>
         )}
-        <form action={signInWithGoogle}>
-          <input type="hidden" name="next" value={safeNext} />
-          <GoogleLoginButton />
-        </form>
+        <GoogleLoginButton next={safeNext} />
         <Link className="guest-link" href="/">
           게스트로 계속하기
         </Link>
