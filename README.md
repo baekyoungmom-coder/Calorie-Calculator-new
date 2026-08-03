@@ -14,6 +14,14 @@ npm run dev
 
 `.env.local`에는 실제 서비스 설정값만 넣고 Git에 커밋하지 않습니다. 필요한 변수와 보안 규칙은 [ENVIRONMENT.md](ENVIRONMENT.md)를 참고하세요.
 
+## 식품영양 데이터
+
+`data/source/official-raw-foods.csv`는 공식 원재료성 식품 데이터의 로컬 스냅샷입니다. `npm run generate:calorie-data`가 이 파일을 앱 검색용 카탈로그로 변환합니다. 기준량(g)과 에너지가 모두 있는 식품만 g 계산을 제공하며, 조리 상태가 다른 식품은 별도 항목으로 선택합니다.
+
+운영 환경에서는 `supabase/migrations/20260803110000_add_food_reference_data.sql`의 `foods` 테이블에 공식 데이터를 서버 전용 동기화 작업으로 적재합니다. 사용자 검색 시 외부 API를 직접 호출하지 않습니다.
+
+Supabase SQL Editor 또는 CLI로 마이그레이션을 적용한 뒤, 로컬 개발 환경에서는 `npm run sync:foods`를 실행해 원재료성 식품을 적재합니다. 이 명령은 `.env.local`의 서버 전용 키를 사용하며, 키를 출력하거나 커밋하지 않습니다.
+
 ## 다른 컴퓨터에서 이어서 작업하기
 
 Git 번들 백업과 시작 안내를 USB로 옮기는 절차, 무결성 확인, Codex 시작 프롬프트는 [PORTABLE_BACKUP_GUIDE.md](PORTABLE_BACKUP_GUIDE.md)에 정리되어 있습니다.

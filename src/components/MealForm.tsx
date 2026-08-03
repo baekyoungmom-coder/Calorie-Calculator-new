@@ -23,6 +23,7 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
   const router = useRouter();
   const [foodName, setFoodName] = useState("");
   const [servings, setServings] = useState(1);
+  const [grams, setGrams] = useState(100);
   const [manualEntry, setManualEntry] = useState(false);
   const [manualAmount, setManualAmount] = useState("");
   const [manualCalories, setManualCalories] = useState("");
@@ -49,6 +50,13 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
       setError("정확한 계산을 위해 검색 결과에서 음식을 선택해 주세요.");
       return;
     }
+    if (
+      selectedFood?.basisGrams &&
+      (!Number.isFinite(grams) || grams < 1 || grams > 5000)
+    ) {
+      setError("섭취량은 1~5,000g 사이로 입력해 주세요.");
+      return;
+    }
     if (isManualMode && !manualAmount.trim()) {
       setError("직접 입력할 음식의 양을 입력해 주세요.");
       return;
@@ -72,12 +80,16 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
       foodName: selectedFood?.name ?? foodName.trim(),
       amount: isManualMode
         ? manualAmount.trim()
-        : `${servings.toLocaleString("ko-KR")}인분`,
+        : selectedFood?.basisGrams
+          ? `${grams.toLocaleString("ko-KR")}g`
+          : `${servings.toLocaleString("ko-KR")}인분`,
       mealType,
       memo: memo.trim(),
       recordedAt: new Date(recordedAt).toISOString(),
       imageName,
       calorieSource: isManualMode ? "manual" : "catalog",
+      foodSourceCode: selectedFood?.sourceCode,
+      foodBasisGrams: selectedFood?.basisGrams,
     };
     if (isManualMode) {
       draft.estimatedCalories = enteredCalories;
@@ -110,10 +122,11 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
           setFoodName(value);
           setError("");
         }}
-        onSelect={() => {
+        onSelect={(food) => {
           setManualEntry(false);
           setManualAmount("");
           setManualCalories("");
+          if (food.basisGrams) setGrams(food.basisGrams);
           setError("");
         }}
         noResultsMessage="칼로리 자료에서 일치하는 음식을 찾지 못했어요."
@@ -180,22 +193,44 @@ export function MealForm({ inputType, imageName }: MealFormProps) {
           </label>
         </>
       ) : (
-        <label>
-          섭취량
-          <select
-            value={servings}
-            onChange={(event) => setServings(Number(event.target.value))}
-          >
-            {SERVING_OPTIONS.map((value) => (
-              <option key={value} value={value}>
-                {value.toLocaleString("ko-KR")}인분
-              </option>
-            ))}
-          </select>
-          <small className="field-help">
-            현재 데이터는 1인분 기준이므로 인분 수로 계산해요.
-          </small>
-        </label>
+        selectedFood?.basisGrams ? (
+          <label>
+            섭취량
+            <span className="calorie-input-wrap">
+              <input
+                type="number"
+                inputMode="decimal"
+                min="1"
+                max="5000"
+                step="1"
+                value={grams}
+                onChange={(event) => setGrams(Number(event.target.value))}
+                required
+              />
+              <small>g</small>
+            </span>
+            <small className="field-help">
+              공식 데이터의 {selectedFood.basisGrams.toLocaleString("ko-KR")}g당 {Math.round(selectedFood.calories).toLocaleString("ko-KR")} kcal 기준으로 계산해요.
+            </small>
+          </label>
+        ) : (
+          <label>
+            섭취량
+            <select
+              value={servings}
+              onChange={(event) => setServings(Number(event.target.value))}
+            >
+              {SERVING_OPTIONS.map((value) => (
+                <option key={value} value={value}>
+                  {value.toLocaleString("ko-KR")}인분
+                </option>
+              ))}
+            </select>
+            <small className="field-help">
+              현재 데이터는 1인분 기준이므로 인분 수로 계산해요.
+            </small>
+          </label>
+        )
       )}
       <fieldset>
         <legend>식사 종류</legend>

@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  calculateGramCalories,
   calculateServingCalories,
   findExactCalorieFood,
+  parseGramAmount,
   parseServingMultiplier,
   prepareCalorieCatalog,
   searchPreparedCalorieCatalog,
@@ -54,10 +56,26 @@ test("1인분 칼로리에 인분 배수를 적용하고 반올림한다", () =>
   assert.equal(calculateServingCalories(500, 2), 1000);
 });
 
+test("공식 기준량이 있는 식품은 입력한 g에 비례해 계산한다", () => {
+  assert.equal(parseGramAmount("150g"), 150);
+  assert.equal(parseGramAmount("0g"), null);
+  assert.equal(calculateGramCalories(147, 100, 150), 221);
+});
+
 test("프로젝트 칼로리 파일에서 실제 음식을 검색하고 계산한다", () => {
   const riceCake = findExactCalorieFood(actualCatalog, "가래떡 떡국용");
 
   assert.ok(actualCatalog.length >= 600);
   assert.equal(riceCake?.calories, 311);
   assert.equal(calculateServingCalories(riceCake?.calories ?? 0, 1.5), 467);
+});
+
+test("공식 원재료성 식품은 식품코드와 g 기준량을 보존한다", () => {
+  const sweetPotato = actualCatalog.find(
+    (food) => food.sourceCode === "R102-006000001-0000",
+  );
+
+  assert.equal(sweetPotato?.name, "고구마 생것");
+  assert.equal(sweetPotato?.basisGrams, 100);
+  assert.equal(sweetPotato?.calories, 147);
 });

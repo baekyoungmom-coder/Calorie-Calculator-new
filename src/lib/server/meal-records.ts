@@ -16,6 +16,8 @@ export type MealRecordPayload = {
   finalCalories: number;
   confidence: Confidence;
   estimateReason: string | null;
+  foodSourceCode: string | null;
+  foodBasisGrams: number | null;
   recordedAt: string;
   recordedTimezone: string;
 };
@@ -43,6 +45,8 @@ export function validateMealRecord(body: unknown): { value?: MealRecordPayload; 
   if (!validCalories(input.finalCalories)) errors.push("최종 칼로리는 0~10,000의 정수여야 합니다.");
   if (!isOneOf(input.confidence, CONFIDENCE_LEVELS)) errors.push("신뢰도가 올바르지 않습니다.");
   if (input.estimateReason !== undefined && input.estimateReason !== null && !validText(input.estimateReason, 0, 500)) errors.push("추정 설명은 500자 이하여야 합니다.");
+  if (input.foodSourceCode !== undefined && input.foodSourceCode !== null && !validText(input.foodSourceCode, 1, 100)) errors.push("식품 출처 코드는 100자 이하여야 합니다.");
+  if (input.foodBasisGrams !== undefined && input.foodBasisGrams !== null && (typeof input.foodBasisGrams !== "number" || !Number.isFinite(input.foodBasisGrams) || input.foodBasisGrams <= 0)) errors.push("식품 기준량은 0보다 커야 합니다.");
   if (typeof input.recordedAt !== "string" || Number.isNaN(Date.parse(input.recordedAt))) errors.push("기록 시각이 올바르지 않습니다.");
   if (!validText(input.recordedTimezone, 1, 100)) errors.push("기기 시간대가 올바르지 않습니다.");
 
@@ -60,6 +64,8 @@ export function validateMealRecord(body: unknown): { value?: MealRecordPayload; 
       finalCalories: input.finalCalories as number,
       confidence: input.confidence as Confidence,
       estimateReason: typeof input.estimateReason === "string" && input.estimateReason.trim() ? input.estimateReason.trim() : null,
+      foodSourceCode: typeof input.foodSourceCode === "string" && input.foodSourceCode.trim() ? input.foodSourceCode.trim() : null,
+      foodBasisGrams: typeof input.foodBasisGrams === "number" ? input.foodBasisGrams : null,
       recordedAt: input.recordedAt as string,
       recordedTimezone: (input.recordedTimezone as string).trim(),
     },
@@ -78,6 +84,8 @@ export function toMealRecord(row: Record<string, unknown>) {
     finalCalories: row.final_calories as number,
     confidence: row.confidence as Confidence,
     reason: row.estimate_reason as string | null,
+    foodSourceCode: row.food_source_code as string | null,
+    foodBasisGrams: row.food_basis_grams as number | null,
     recordedAt: row.recorded_at as string,
     recordedTimezone: row.recorded_timezone as string,
     createdAt: row.created_at as string,

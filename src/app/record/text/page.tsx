@@ -9,7 +9,7 @@ export default function TextRecordPage() {
       <PageHero
         eyebrow="직접 입력"
         title="무엇을 드셨나요?"
-        description="음식을 검색해 선택하고 드신 인분 수를 알려주세요."
+        description="음식을 검색해 선택하고 드신 양을 알려주세요. g 기준 식품은 무게로 계산해요."
         icon="edit"
         tone="peach"
         compact

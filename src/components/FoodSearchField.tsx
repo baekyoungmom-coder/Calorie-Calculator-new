@@ -71,7 +71,9 @@ export function FoodSearchField({
               >
                 <span>{food.name}</span>
                 <small>
-                  1인분 {Math.round(food.calories).toLocaleString()} kcal
+                  {food.basisGrams
+                    ? `${food.basisGrams.toLocaleString("ko-KR")}g당 ${Math.round(food.calories).toLocaleString()} kcal`
+                    : `1인분 ${Math.round(food.calories).toLocaleString()} kcal`}
                 </small>
               </button>
             ))}
@@ -84,7 +86,9 @@ export function FoodSearchField({
       {selectedFood && (
         <p className="food-match" role="status">
           <span>선택됨</span>
-          {selectedFood.name} · 1인분{" "}
+          {selectedFood.name} · {selectedFood.basisGrams
+            ? `${selectedFood.basisGrams.toLocaleString("ko-KR")}g당`
+            : "1인분"}{" "}
           {Math.round(selectedFood.calories).toLocaleString()} kcal
         </p>
       )}
