@@ -269,6 +269,8 @@ export default function ResultPage() {
           finalCalories: calories,
           confidence,
           estimateReason: reason,
+          foodSourceCode: draft.foodSourceCode,
+          foodBasisGrams: draft.foodBasisGrams,
           recordedAt: draft.recordedAt,
           recordedTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
@@ -381,9 +383,9 @@ export default function ResultPage() {
           <div>
             <span>계산 기준</span>
             <strong>
-              1인분 {Math.round(estimate.caloriesPerServing).toLocaleString()} kcal
-              {estimate.servings !== null &&
-                ` × ${estimate.servings.toLocaleString("ko-KR")}`}
+              {estimate.basisGrams !== null
+                ? `${estimate.basisGrams.toLocaleString("ko-KR")}g당 ${Math.round(estimate.caloriesPerServing).toLocaleString()} kcal${estimate.grams !== null ? ` · ${estimate.grams.toLocaleString("ko-KR")}g 입력` : ""}`
+                : `1인분 ${Math.round(estimate.caloriesPerServing).toLocaleString()} kcal${estimate.servings !== null ? ` × ${estimate.servings.toLocaleString("ko-KR")}` : ""}`}
             </strong>
           </div>
         )}

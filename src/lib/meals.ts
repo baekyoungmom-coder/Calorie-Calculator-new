@@ -1,7 +1,9 @@
 import calorieCatalog from "@/generated/calorie-catalog.json";
 import {
+  calculateGramCalories,
   calculateServingCalories,
   findExactCalorieFood,
+  parseGramAmount,
   parseServingMultiplier,
   prepareCalorieCatalog,
   searchPreparedCalorieCatalog,
@@ -22,6 +24,8 @@ export type MealDraft = {
   memo: string;
   recordedAt: string;
   imageName?: string;
+  foodSourceCode?: string;
+  foodBasisGrams?: number;
   calorieSource?: "catalog" | "manual";
   estimatedCalories?: number;
   finalCalories?: number;
@@ -48,19 +52,18 @@ export function searchCalorieFoods(foodName: string, limit = 6) {
   return searchPreparedCalorieCatalog(CATALOG, foodName, limit);
 }
 
-function amountMultiplier(amount: string) {
-  if (/(?:kg|킬로그램|g|그램|ml|밀리리터|l|리터)(?:\s|$)/i.test(amount)) {
-    return { multiplier: 1, isConvertible: false };
-  }
+function parseAmount(amount: string) {
+  const grams = parseGramAmount(amount);
+  if (grams !== null) return { type: "gram" as const, grams };
 
   const multiplier = parseServingMultiplier(amount);
   if (multiplier === null) {
-    return { multiplier: 1, isConvertible: false };
+    return { type: "unknown" as const };
   }
 
   return {
-    multiplier,
-    isConvertible: true,
+    type: "serving" as const,
+    servings: multiplier,
   };
 }
 
@@ -73,6 +76,8 @@ export function estimateMeal(draft: MealDraft): Required<
 > & {
   matchedFoodName: string | null;
   caloriesPerServing: number | null;
+  basisGrams: number | null;
+  grams: number | null;
   servings: number | null;
 } {
   if (!draft.foodName.trim() || draft.foodName === "사진 속 음식") {
@@ -83,14 +88,22 @@ export function estimateMeal(draft: MealDraft): Required<
         "사진만으로 만든 임시 추정치예요. 음식 이름과 양을 확인하면 기록이 더 정확해져요.",
       matchedFoodName: null,
       caloriesPerServing: null,
+      basisGrams: null,
+      grams: null,
       servings: null,
     };
   }
 
   const match = findCalorieFood(draft.foodName);
-  const amount = amountMultiplier(draft.amount);
+  const amount = parseAmount(draft.amount);
   const base = match?.calories ?? (draft.inputType === "photo" ? 450 : 350);
-  const calories = calculateServingCalories(base, amount.multiplier);
+  const calories =
+    amount.type === "gram" && match?.basisGrams
+      ? calculateGramCalories(base, match.basisGrams, amount.grams)
+      : calculateServingCalories(
+          base,
+          amount.type === "serving" ? amount.servings : 1,
+        );
 
   if (!match) {
     return {
@@ -100,17 +113,24 @@ export function estimateMeal(draft: MealDraft): Required<
         "칼로리 정보 파일에서 정확히 일치하는 음식을 찾지 못해 임시 추정값을 표시했어요. 음식 이름과 결과를 직접 확인해 주세요.",
       matchedFoodName: null,
       caloriesPerServing: null,
-      servings: amount.isConvertible ? amount.multiplier : null,
+      basisGrams: null,
+      grams: amount.type === "gram" ? amount.grams : null,
+      servings: amount.type === "serving" ? amount.servings : null,
     };
   }
 
   const sourceDescription =
-    match.count > 1
+    match.basisGrams
+      ? `${match.source ?? "공식 식품영양성분 DB"}의 '${match.name}' ${formatCalories(match.basisGrams)}g당 ${formatCalories(match.calories)} kcal`
+      : match.count > 1
       ? `칼로리 정보 파일의 '${match.name}' 관련 ${match.count}개 값 평균 ${formatCalories(match.calories)} kcal`
       : `칼로리 정보 파일의 '${match.name}' 1인분 ${formatCalories(match.calories)} kcal`;
-  const amountDescription = amount.isConvertible
-    ? `입력한 양을 ${formatCalories(amount.multiplier)}배 반영했어요.`
-    : `파일에 1인분 중량 정보가 없어 '${draft.amount}'은(는) 1인분 기준으로 계산했어요.`;
+  const amountDescription =
+    amount.type === "gram" && match.basisGrams
+      ? `${formatCalories(amount.grams)}g을 기준량에 비례해 계산했어요.`
+      : amount.type === "serving"
+        ? `입력한 양을 ${formatCalories(amount.servings)}배 반영했어요.`
+        : `입력한 양의 단위를 계산에 반영하지 못해 1인분 기준으로 표시했어요.`;
 
   return {
     estimatedCalories: calories,
@@ -118,7 +138,9 @@ export function estimateMeal(draft: MealDraft): Required<
     reason: `${sourceDescription}를 기준으로 ${amountDescription}`,
     matchedFoodName: match.name,
     caloriesPerServing: match.calories,
-    servings: amount.isConvertible ? amount.multiplier : null,
+    basisGrams: match.basisGrams ?? null,
+    grams: amount.type === "gram" ? amount.grams : null,
+    servings: amount.type === "serving" ? amount.servings : null,
   };
 }
 

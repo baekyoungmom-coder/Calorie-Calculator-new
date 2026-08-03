@@ -64,6 +64,8 @@ export async function POST(request: NextRequest) {
       final_calories: value.finalCalories,
       confidence: value.confidence,
       estimate_reason: value.estimateReason,
+      food_source_code: value.foodSourceCode,
+      food_basis_grams: value.foodBasisGrams,
       recorded_at: value.recordedAt,
       recorded_timezone: value.recordedTimezone,
     })

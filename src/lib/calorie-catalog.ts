@@ -1,6 +1,11 @@
 export type RawCalorieFood = {
+  id?: string;
   name: string;
   calories: number;
+  basisGrams?: number;
+  source?: string;
+  sourceCode?: string;
+  sourceUpdatedAt?: string | null;
 };
 
 export type CalorieFood = RawCalorieFood & {
@@ -27,6 +32,15 @@ export function prepareCalorieCatalog(
     const normalizedName = normalizeFoodName(entry.name);
     if (!normalizedName || !Number.isFinite(entry.calories)) continue;
 
+    if (entry.id) {
+      grouped.set(entry.id, {
+        name: entry.name,
+        totalCalories: entry.calories,
+        count: 1,
+      });
+      continue;
+    }
+
     const existing = grouped.get(normalizedName);
     if (existing) {
       existing.totalCalories += entry.calories;
@@ -41,12 +55,16 @@ export function prepareCalorieCatalog(
     });
   }
 
-  return Array.from(grouped, ([normalizedName, entry]) => ({
-    name: entry.name,
-    calories: entry.totalCalories / entry.count,
-    count: entry.count,
-    normalizedName,
-  }));
+  return Array.from(grouped, ([key, entry]) => {
+    const original = entries.find((candidate) => candidate.id === key);
+    return {
+      ...(original ?? {}),
+      name: entry.name,
+      calories: entry.totalCalories / entry.count,
+      count: entry.count,
+      normalizedName: normalizeFoodName(entry.name),
+    };
+  });
 }
 
 export function findExactCalorieFood(
@@ -111,4 +129,22 @@ export function calculateServingCalories(
   servings: number,
 ) {
   return Math.round(caloriesPerServing * servings);
+}
+
+export function calculateGramCalories(
+  caloriesPerBasis: number,
+  basisGrams: number,
+  grams: number,
+) {
+  return Math.round((caloriesPerBasis * grams) / basisGrams);
+}
+
+export function parseGramAmount(amount: string) {
+  const match = amount.trim().match(/^(\d+(?:\.\d+)?)\s*(?:g|그램)$/i);
+  if (!match) return null;
+
+  const grams = Number.parseFloat(match[1]);
+  if (!Number.isFinite(grams) || grams <= 0 || grams > 5000) return null;
+
+  return grams;
 }

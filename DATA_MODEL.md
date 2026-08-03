@@ -14,6 +14,25 @@ Calorie Calculator 앱에서 저장해야 하는 데이터 구조를 정의한�
 
 ## 엔터티
 
+### 0. foods
+
+공식 식품영양성분 DB를 동기화해 보관하는 기준 데이터다. 사용자 식사 기록과 분리하며, 동기화 작업만 쓰기 권한을 갖는다.
+
+필드 예시:
+- source_name
+- source_food_code : 공식 원본 식품코드, 중복 불가
+- name
+- normalized_name
+- food_type : raw / processed / dish
+- energy_kcal
+- basis_grams : 영양성분과 에너지의 기준량(g)
+- serving_grams : 1회 섭취 참고량(g), 제공될 때만 저장
+- source_updated_at
+- synced_at
+- is_active
+
+`basis_grams`가 있는 식품에만 g 단위 칼로리 계산을 제공한다. 계산식은 `energy_kcal × 입력량(g) ÷ basis_grams`이며, 식품코드와 기준량은 식사 기록의 계산 근거로 함께 보관할 수 있다.
+
 ### 1. profiles
 사용자 프로필 정보
 
@@ -41,6 +60,8 @@ Calorie Calculator 앱에서 저장해야 하는 데이터 구조를 정의한�
 - final_calories
 - confidence
 - estimate_reason
+- food_source_code : 향후 공식 식품코드 저장용 선택 필드
+- food_basis_grams : 향후 계산 기준량 저장용 선택 필드
 - recorded_at
 - recorded_timezone
 - created_at
