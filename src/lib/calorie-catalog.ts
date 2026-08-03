@@ -91,9 +91,11 @@ export function searchPreparedCalorieCatalog(
     .map((entry) => {
       let score = Number.POSITIVE_INFINITY;
 
-      if (entry.normalizedName === normalizedQuery) score = 0;
-      else if (entry.normalizedName.startsWith(normalizedQuery)) score = 1;
-      else if (entry.normalizedName.includes(normalizedQuery)) score = 2;
+      if (entry.basisGrams && entry.normalizedName.startsWith(normalizedQuery)) {
+        score = entry.name.includes("생것") ? -1 : 0;
+      } else if (entry.normalizedName === normalizedQuery) score = 1;
+      else if (entry.normalizedName.startsWith(normalizedQuery)) score = 2;
+      else if (entry.normalizedName.includes(normalizedQuery)) score = 3;
 
       return { entry, score };
     })
