@@ -22,6 +22,8 @@ npm run dev
 
 먼저 `npm run sync:foods:dry-run`으로 변환 건수·식품코드 중복·g 기준량을 DB에 쓰지 않고 검증합니다. Supabase SQL Editor 또는 CLI로 마이그레이션을 적용한 뒤, `npm run sync:foods`, `npm run verify:foods` 순으로 실행해 원재료성 식품을 적재하고 DB의 건수·식품코드·기준량·에너지 표본을 대조합니다. 동기화와 검증 명령은 `.env.local`의 서버 전용 키를 사용하며, 키를 출력하거나 커밋하지 않습니다.
 
+OAuth 로그인은 요청이 들어온 도메인을 콜백 URL로 사용합니다. Supabase Auth의 Redirect URLs에는 운영 도메인과 Vercel Preview 도메인 패턴을 등록해야 합니다.
+
 ## 다른 컴퓨터에서 이어서 작업하기
 
 Git 번들 백업과 시작 안내를 USB로 옮기는 절차, 무결성 확인, Codex 시작 프롬프트는 [PORTABLE_BACKUP_GUIDE.md](PORTABLE_BACKUP_GUIDE.md)에 정리되어 있습니다.

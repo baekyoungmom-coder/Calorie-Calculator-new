@@ -5,19 +5,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 function getRequestOrigin(headerStore: Headers) {
-  const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL?.trim();
-
-  if (configuredOrigin) {
-    try {
-      const url = new URL(configuredOrigin);
-      if (url.protocol === "http:" || url.protocol === "https:") {
-        return url.origin;
-      }
-    } catch {
-      console.warn("[auth] NEXT_PUBLIC_APP_URL is not a valid URL.");
-    }
-  }
-
   const origin = headerStore.get("origin");
   if (origin) {
     try {
@@ -33,7 +20,21 @@ function getRequestOrigin(headerStore: Headers) {
   const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
   const protocol = headerStore.get("x-forwarded-proto") ?? "http";
 
-  return host ? `${protocol}://${host}` : null;
+  if (host) return `${protocol}://${host}`;
+
+  const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (configuredOrigin) {
+    try {
+      const url = new URL(configuredOrigin);
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        return url.origin;
+      }
+    } catch {
+      console.warn("[auth] NEXT_PUBLIC_APP_URL is not a valid URL.");
+    }
+  }
+
+  return null;
 }
 
 export async function signInWithGoogle(formData: FormData) {
