@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 function getRequestOrigin(headerStore: Headers) {
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  const protocol = headerStore.get("x-forwarded-proto") ?? "http";
+  if (host) return `${protocol}://${host}`;
+
   const origin = headerStore.get("origin");
   if (origin) {
     try {
@@ -16,11 +20,6 @@ function getRequestOrigin(headerStore: Headers) {
       console.warn("[auth] Request origin is not a valid URL.");
     }
   }
-
-  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
-  const protocol = headerStore.get("x-forwarded-proto") ?? "http";
-
-  if (host) return `${protocol}://${host}`;
 
   const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL?.trim();
   if (!configuredOrigin) return null;
