@@ -37,6 +37,34 @@ function getRequestOrigin(headerStore: Headers) {
   return null;
 }
 
+function getBrowserOrigin(formData: FormData) {
+  const value = formData.get("callbackOrigin");
+  if (typeof value !== "string") return null;
+
+  try {
+    const url = new URL(value);
+    const isProduction = url.hostname === "calorie-calculator-new.vercel.app";
+    const isPreview =
+      url.hostname.startsWith("calorie-calculator-new-") &&
+      url.hostname.endsWith(".vercel.app");
+    const isLocalDevelopment =
+      process.env.NODE_ENV !== "production" &&
+      (url.hostname === "localhost" || url.hostname === "127.0.0.1");
+
+    if (url.protocol === "https:" && (isProduction || isPreview)) {
+      return url.origin;
+    }
+
+    if (url.protocol === "http:" && isLocalDevelopment) {
+      return url.origin;
+    }
+  } catch {
+    console.warn("[auth] Browser callback origin is not a valid URL.");
+  }
+
+  return null;
+}
+
 export async function signInWithGoogle(formData: FormData) {
   const supabase = await createClient();
 
@@ -45,7 +73,7 @@ export async function signInWithGoogle(formData: FormData) {
   }
 
   const headerStore = await headers();
-  const origin = getRequestOrigin(headerStore);
+  const origin = getBrowserOrigin(formData) ?? getRequestOrigin(headerStore);
   const requestedPath = formData.get("next");
   const next =
     typeof requestedPath === "string" &&

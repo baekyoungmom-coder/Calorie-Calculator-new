@@ -30,3 +30,10 @@ Calorie Calculator 앱의 개발 및 배포 환경에서 필요한 설정값을 
 - 브라우저에 노출되는 값은 `NEXT_PUBLIC_` 접두사를 사용한다.
 - 서버 전용 비밀값은 클라이언트 코드에서 직접 읽지 않는다.
 - 없는 값은 런타임에 명확한 오류로 안내한다.
+## Preview OAuth
+
+Google OAuth returns to the browser's current app origin. In Supabase Auth,
+allow both the production callback URL and this Vercel project's Preview
+callback URLs, for example:
+
+`https://calorie-calculator-new-*.vercel.app/auth/callback`
