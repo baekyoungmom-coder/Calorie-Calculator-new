@@ -31,7 +31,6 @@ export default async function MyPage() {
         tone="lavender"
         compact
       />
-      <section className="mypage-workspace" aria-label="마이페이지 관리 영역">
       <section className="profile-card">
         <div className="avatar" aria-hidden="true"><Image src="/images/ui/clay-login-profile.png" alt="" width={62} height={62} priority /></div>
         <div>
@@ -79,7 +78,6 @@ export default async function MyPage() {
       </details>
       <RecordsView mode="all" />
       {user && <div id="account-deletion"><AccountDeletionCard /></div>}
-      </section>
       <BottomNav />
     </main>
   );
