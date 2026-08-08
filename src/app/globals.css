@@ -259,6 +259,44 @@ fieldset { padding: 0; margin: 0; border: 0; }
 .summary-card h1 { margin: 9px 0 5px; font-size: 38px; }
 .summary-card h1 span { font-size: 15px; }
 .summary-card small { opacity: .7; }
+
+.water-card {
+  margin: 0 0 20px;
+  padding: 20px;
+  border: 1px solid #cfe5ee;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #f4fbff, #e7f6fb);
+}
+.water-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.water-kicker { margin: 0 0 5px; color: #287c9a; font-size: 12px; font-weight: 900; letter-spacing: .05em; }
+.water-heading h2 { margin: 0; font-size: 20px; }
+.water-goal { padding: 7px 9px; border-radius: 999px; background: rgb(255 255 255 / 72%); color: #487281; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.water-total { display: flex; align-items: baseline; gap: 5px; margin: 18px 0 11px; }
+.water-total strong { color: #176b88; font-size: 38px; line-height: 1; letter-spacing: -.05em; }
+.water-total > span { color: #176b88; font-size: 15px; font-weight: 900; }
+.water-total small { margin-left: auto; color: #58808f; font-size: 12px; font-weight: 800; }
+.water-progress { height: 10px; overflow: hidden; border-radius: 999px; background: #cde8f1; }
+.water-progress span { display: block; min-width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #43b7dc, #2489ad); transition: width .2s ease; }
+.water-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.water-actions button, .water-custom-form button {
+  min-height: 42px;
+  border: 1px solid #abd5e3;
+  border-radius: 12px;
+  background: #fff;
+  color: #176b88;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 900;
+}
+.water-actions button:hover, .water-custom-form button:hover { background: #def3f9; }
+.water-actions .water-undo { grid-column: 1 / -1; min-height: 34px; border-color: transparent; background: transparent; color: #6c8490; font-size: 12px; }
+.water-actions .water-undo:disabled, .water-custom-form button:disabled { cursor: not-allowed; opacity: .45; }
+.water-custom-form { margin-top: 12px; }
+.water-custom-form > label { display: block; margin-bottom: 7px; color: #58808f; font-size: 12px; font-weight: 900; }
+.water-custom-form > div { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; }
+.water-custom-form input { min-height: 42px; padding: 9px 12px; border-color: #badce6; }
+.water-custom-form span { color: #58808f; font-size: 13px; font-weight: 800; }
+.water-custom-form button { min-width: 56px; padding: 0 13px; background: #2f92b3; border-color: #2f92b3; color: #fff; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .section-heading h2 { margin: 0; font-size: 19px; }
 .section-heading a { color: var(--green); font-size: 13px; font-weight: 800; }
