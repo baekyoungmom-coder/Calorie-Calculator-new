@@ -146,3 +146,8 @@ LLM은 다음을 결정하지 않는다.
 
 실제 값은 `.env.local`과 Vercel Environment Variables에 저장한다.
 MD 파일과 GitHub에는 실제 값을 기록하지 않는다.
+
+## 칼로리 정보csv파일
+ - 프로젝트폴더의 /data에 cal.csv가 있음
+ - 이 csv파일에 모든 음식의 칼로리 정보가 기재되어있음
+ - 프로젝트에서 칼로리를 계산해야할경우 해당 정보를 사용하여 처리할것

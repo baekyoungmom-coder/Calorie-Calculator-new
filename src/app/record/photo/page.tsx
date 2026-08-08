@@ -4,6 +4,8 @@ import Image from "next/image";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { MealForm } from "@/components/MealForm";
+import { AppIcon } from "@/components/AppIcon";
+import { PageHero } from "@/components/PageHero";
 
 export default function PhotoRecordPage() {
   const [preview, setPreview] = useState("");
@@ -29,8 +31,8 @@ export default function PhotoRecordPage() {
     }
     if (preview) URL.revokeObjectURL(preview);
     setPreview(URL.createObjectURL(file));
-    setImageName(file.name);
     setError("");
+    setImageName(file.name);
   }
 
   function clearImage() {
@@ -40,13 +42,17 @@ export default function PhotoRecordPage() {
   }
 
   return (
-    <main className="shell">
+    <main className="shell photo-record-page">
       <Header title="사진 입력" backHref="/record" />
-      <section className="page-intro compact">
-        <p className="eyebrow">사진 기록</p>
-        <h1>음식 사진을 올려주세요</h1>
-        <p>밝은 곳에서 음식 전체가 보이는 사진이 좋아요.</p>
-      </section>
+      <PageHero
+        eyebrow="사진 기록"
+        title="음식 사진을 올려주세요"
+        description="사진을 보며 음식 이름을 검색하고 섭취량을 입력해요."
+        icon="camera"
+        imageSrc="/images/ui/clay-camera.png"
+        tone="sky"
+        compact
+      />
 
       <section className={`upload-box ${preview ? "has-image" : ""}`}>
         {preview ? (
@@ -58,8 +64,8 @@ export default function PhotoRecordPage() {
           </>
         ) : (
           <>
-            <span className="upload-icon" aria-hidden="true">＋</span>
-            <strong>사진을 선택하세요</strong>
+            <span className="upload-icon"><Image src="/images/ui/clay-camera.png" alt="" width={56} height={56} priority /></span>
+            <strong>사진을 여기에 담아주세요</strong>
             <span>JPG, PNG, WEBP · 최대 8MB</span>
             <label className="upload-button">
               카메라 또는 갤러리
@@ -68,6 +74,9 @@ export default function PhotoRecordPage() {
           </>
         )}
       </section>
+      {!preview && (
+        <p className="flow-note"><AppIcon name="sparkles" size={17} /> 사진은 이 기기에만 임시로 표시되며, 저장 전 음식 정보를 직접 확인해요.</p>
+      )}
       {error && <p className="error" role="alert">{error}</p>}
       {preview ? (
         <MealForm inputType="photo" imageName={imageName} />

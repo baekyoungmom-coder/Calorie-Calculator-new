@@ -1,17 +1,19 @@
-import { createServerClient, type SetAllCookies } from "@supabase/ssr";
+import {
+  createServerClient,
+  type SetAllCookies,
+} from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseConfig } from "@/lib/supabase/config";
 
 export async function middleware(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publishableKey =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const config = getSupabaseConfig();
 
-  if (!url || !publishableKey) {
+  if (!config) {
     return NextResponse.next({ request });
   }
 
   let response = NextResponse.next({ request });
-  const supabase = createServerClient(url, publishableKey, {
+  const supabase = createServerClient(config.url, config.key, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

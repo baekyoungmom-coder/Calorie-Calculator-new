@@ -1,15 +1,20 @@
 import { Header } from "@/components/Header";
 import { MealForm } from "@/components/MealForm";
+import { PageHero } from "@/components/PageHero";
 
 export default function TextRecordPage() {
   return (
-    <main className="shell">
+    <main className="shell text-record-page">
       <Header title="직접 입력" backHref="/record" />
-      <section className="page-intro compact">
-        <p className="eyebrow">텍스트 기록</p>
-        <h1>무엇을 드셨나요?</h1>
-        <p>예: 김밥 1줄, 샐러드 200g</p>
-      </section>
+      <PageHero
+        eyebrow="직접 입력"
+        title="무엇을 드셨나요?"
+        description="음식을 검색해 선택하고 드신 인분 수를 알려주세요."
+        icon="edit"
+        imageSrc="/images/ui/clay-notepad.png"
+        tone="peach"
+        compact
+      />
       <MealForm inputType="text" />
     </main>
   );

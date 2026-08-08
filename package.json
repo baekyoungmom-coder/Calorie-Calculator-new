@@ -4,6 +4,9 @@
   "private": true,
   "description": "An app that estimates calories from food photos or text input and saves meal records.",
   "scripts": {
+    "generate:calorie-data": "node scripts/generate-calorie-data.mjs",
+    "prebuild": "npm run generate:calorie-data",
+    "test:calorie": "node --no-warnings --test tests/account-deletion.test.mjs tests/calorie-catalog.test.mjs tests/guest-trial.test.mjs tests/meal-records.test.mjs tests/result-draft.test.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

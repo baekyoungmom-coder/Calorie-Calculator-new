@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-08-02T21:26:06+09:00",
+  "primary_rows_after_code_dedup": 40500,
+  "supplement_rows_added_by_name": 650,
+  "combined_rows": 41150,
+  "basis_units": {
+    "g": 36208,
+    "ml": 4942
+  },
+  "source_kinds": {
+    "primary_db1": 40500,
+    "supplement_dbx": 650
+  },
+  "reference_kcal_rows": 494,
+  "missing_energy_rows": 0,
+  "notes": [
+    "db1.csv is the primary dataset; db.xlsx contributes names absent from db1.csv.",
+    "Energy remains tied to basis_amount/basis_unit; no implicit serving conversion is applied.",
+    "Review and approve before importing into Supabase or replacing the app catalog."
+  ]
+}
