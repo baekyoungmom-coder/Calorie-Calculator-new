@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { RecordsView } from "@/components/RecordsView";
+import { WaterTracker } from "@/components/WaterTracker";
 import { AppIcon } from "@/components/AppIcon";
 import { PageHero } from "@/components/PageHero";
 
@@ -23,6 +24,7 @@ export default function TodayPage() {
         tone="sky"
         compact
       />
+      <WaterTracker />
       <section className="today-workspace" aria-label="오늘 기록 요약과 식사 목록">
         <RecordsView mode="today" />
       </section>
